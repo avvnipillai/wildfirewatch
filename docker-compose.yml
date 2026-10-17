@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SECRET_KEY=your-very-long-secret-key-here
+      - DEBUG=False
+      - ALLOWED_HOSTS=localhost 127.0.0.1
+    volumes:
+      # Mount your trained models and data into the container
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./media:/app/media
+    restart: unless-stopped

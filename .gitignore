@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+db.sqlite3
+staticfiles/
+media/
+*.log
+.DS_Store
+# Ignore heavy raw data files inside research/data/
+research/data/*.nc
+research/data/*.csv
+
+# (Optional) Keep the data directory structure tracked in git
+!research/data/.gitkeep
