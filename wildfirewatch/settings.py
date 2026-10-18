@@ -9,8 +9,9 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me-in-production')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ.get(
     'ALLOWED_HOSTS',
-    'localhost 127.0.0.1 testserver'
+    'localhost 127.0.0.1 testserver wildfirewatch-2.onrender.com'
 ).split()
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
