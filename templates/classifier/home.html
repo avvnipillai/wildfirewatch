@@ -3,904 +3,1095 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Aegis Thermal Intelligence</title>
+  <title>Agni · Thermal Intelligence</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
 
 <style>
-/* ─── DESIGN TOKENS (PEACH, BLUSH, LAVENDER, VIOLET PALETTE) ──────────────── */
+/* ── TOKENS ────────────────────────────────────────────── */
 :root {
-  --void:        #06040c;
-  --surface:     #0c0816;
-  --glass:       #140f22;
-  --rim:         #241a3a;
-  --rim-glow:    #4a3075;
-  
-  --peach:       #ffb088;
-  --blush:       #f48fb1;
-  --mauve:       #ce93d8;
-  --lavender:    #b39ddb;
-  --violet:      #7e57c2;
-  --deep-violet: #512da8;
+  --bg:        #080c13;
+  --surface:   #0d1826;
+  --card:      #121e2e;
+  --raised:    #172435;
 
-  --fire:        #ff6f59;
-  --ember:       #ffa726;
-  --text-main:   #f3eef8;
-  --text-muted:  #ab9ebc;
+  --border:    rgba(255,255,255,0.065);
+  --border-hi: rgba(255,255,255,0.11);
 
-  --grad-warm:   linear-gradient(135deg, var(--peach) 0%, var(--blush) 50%, var(--mauve) 100%);
-  --grad-cool:   linear-gradient(135deg, var(--mauve) 0%, var(--lavender) 50%, var(--violet) 100%);
-  --grad-hot:    linear-gradient(135deg, var(--fire) 0%, var(--ember) 100%);
-  --grad-mesh:   radial-gradient(circle at 20% 20%, rgba(206,147,216,0.12) 0%, transparent 40%),
-                 radial-gradient(circle at 80% 80%, rgba(126,87,194,0.1) 0%, transparent 40%);
+  /* Wildfire — muted coral */
+  --fire:      #c97250;
+  --fire-lt:   #e09a76;
+  --fire-dk:   #904e30;
+  --fire-dim:  rgba(201,114,80,0.11);
+  --fire-glow: rgba(201,114,80,0.28);
 
-  --ff-display: 'Syne', sans-serif;
-  --ff-body:    'Plus Jakarta Sans', sans-serif;
-  --ff-mono:    'JetBrains Mono', monospace;
+  /* Industrial — steel blue */
+  --ind:       #4a86a4;
+  --ind-lt:    #74aec8;
+  --ind-dk:    #2d6080;
+  --ind-dim:   rgba(74,134,164,0.11);
+  --ind-glow:  rgba(74,134,164,0.28);
+
+  /* Text */
+  --t1: #d4cfc7;
+  --t2: #7a8998;
+  --t3: #364554;
+
+  --serif: 'Lora', Georgia, serif;
+  --sans:  'DM Sans', system-ui, sans-serif;
+  --mono:  'JetBrains Mono', monospace;
 
   color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
+html, body { height: 100%; overflow: hidden; }
 body {
-  font-family: var(--ff-body);
-  background: var(--void);
-  color: var(--text-main);
-  font-size: 14px;
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--t1);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ─── HEADER ─────────────────────────────────────────────────────────────── */
+/* ── HEADER ────────────────────────────────────────────── */
 header {
-  position: relative;
-  height: 64px;
+  height: 54px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  padding: 0 28px;
-  gap: 24px;
+  padding: 0 18px;
+  gap: 14px;
   background: var(--surface);
-  border-bottom: 1px solid var(--rim);
-  z-index: 100;
-}
-
-header::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--grad-warm);
-  opacity: 0.6;
+  border-bottom: 1px solid var(--border);
+  z-index: 300;
 }
 
 .brand {
-  font-family: var(--ff-display);
-  font-weight: 800;
-  font-size: 1.25rem;
-  letter-spacing: -0.02em;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
 }
 
-.brand-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  background: var(--grad-warm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  box-shadow: 0 0 20px rgba(244,143,177,0.3);
-  animation: brand-pulse 4s ease-in-out infinite;
+.brand-mark {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(145deg, var(--fire-lt) 0%, var(--fire) 55%, var(--fire-dk) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  box-shadow: 0 2px 12px var(--fire-glow);
+  flex-shrink: 0;
 }
 
-@keyframes brand-pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(244,143,177,0.2); }
-  50%      { transform: scale(1.05); box-shadow: 0 0 25px rgba(206,147,216,0.4); }
-}
+.brand-text { display: flex; flex-direction: column; gap: 1px; }
 
 .brand-name {
-  background: var(--grad-warm);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--t1);
 }
 
-.system-badge {
-  font-family: var(--ff-mono);
-  font-size: 0.65rem;
+.brand-sub {
+  font-family: var(--mono);
+  font-size: 0.48rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--lavender);
-  background: rgba(179,157,219,0.08);
-  border: 1px solid rgba(179,157,219,0.2);
-  padding: 4px 12px;
-  border-radius: 100px;
+  color: var(--t3);
+  line-height: 1;
 }
 
-.header-spacer { flex: 1; }
-
-.nav-pill {
-  font-family: var(--ff-display);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 10px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.nav-pill:hover { color: var(--text-main); background: var(--glass); }
-.nav-pill.active {
-  color: var(--peach);
-  background: rgba(255,176,136,0.1);
-  border: 1px solid rgba(255,176,136,0.2);
-}
-
-/* ─── MAIN LAYOUT ────────────────────────────────────────────────────────── */
-.workspace {
-  flex: 1;
+.live-pill {
   display: flex;
-  overflow: hidden;
-  position: relative;
+  align-items: center;
+  gap: 5px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 3px 10px;
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t2);
+  flex-shrink: 0;
 }
 
-.workspace::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--grad-mesh);
-  pointer-events: none;
-  z-index: 1;
+.live-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #4aae80;
+  box-shadow: 0 0 7px rgba(74,174,128,0.65);
+  animation: dot-blink 3s ease-in-out infinite;
 }
 
-/* ─── COMMAND SIDEBAR ────────────────────────────────────────────────────── */
-.sidebar {
-  width: 360px;
+@keyframes dot-blink {
+  0%,100% { opacity: 1; }
+  55%      { opacity: 0.3; }
+}
+
+.h-sep { flex: 1; }
+
+.nav-link {
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--t2);
+  text-decoration: none;
+  padding: 5px 12px;
+  border-radius: 7px;
+  transition: color 0.14s, background 0.14s;
+}
+
+.nav-link:hover { color: var(--t1); background: var(--card); }
+
+.nav-link.active {
+  color: var(--fire-lt);
+  background: var(--fire-dim);
+  border: 1px solid rgba(201,114,80,0.2);
+}
+
+/* ── WORKSPACE ─────────────────────────────────────────── */
+.workspace { flex: 1; display: flex; overflow: hidden; }
+
+/* ── SIDEBAR ───────────────────────────────────────────── */
+aside {
+  width: 334px;
   flex-shrink: 0;
   background: var(--surface);
-  border-right: 1px solid var(--rim);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  z-index: 2;
-  position: relative;
+  z-index: 200;
 }
 
-.sidebar-scroll {
+.sb-scroll {
   flex: 1;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: var(--rim) transparent;
-  padding: 20px;
+  scrollbar-color: var(--card) transparent;
+  padding: 13px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 9px;
 }
 
-.sidebar-scroll::-webkit-scrollbar { width: 5px; }
-.sidebar-scroll::-webkit-scrollbar-thumb { background: var(--rim); border-radius: 10px; }
+.sb-scroll::-webkit-scrollbar { width: 4px; }
+.sb-scroll::-webkit-scrollbar-thumb { background: var(--card); border-radius: 4px; }
 
-/* ─── METRIC TELEMETRY GRID ──────────────────────────────────────────────── */
-.metrics-grid {
+/* ── METRIC TILES ──────────────────────────────────────── */
+.metrics {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 6px;
 }
 
-.metric-card {
-  background: var(--glass);
-  border: 1px solid var(--rim);
-  border-radius: 14px;
-  padding: 14px 10px;
+.m-tile {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 13px 8px 11px;
   text-align: center;
   position: relative;
   overflow: hidden;
-  transition: border-color 0.2s;
 }
 
-.metric-card:hover { border-color: var(--rim-glow); }
-
-.metric-value {
-  font-family: var(--ff-display);
-  font-weight: 800;
-  font-size: 1.4rem;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  background: var(--grad-warm);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.m-tile::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 20%; right: 20%;
+  height: 1.5px;
 }
-.metric-value.wild-metric { background: var(--grad-hot); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.metric-value.ind-metric  { background: var(--grad-cool); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-.metric-label {
-  font-family: var(--ff-mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.12em;
+.m-total::after { background: linear-gradient(90deg, transparent, var(--t3), transparent); }
+.m-fire::after  { background: linear-gradient(90deg, transparent, var(--fire), transparent); }
+.m-ind::after   { background: linear-gradient(90deg, transparent, var(--ind), transparent); }
+
+.m-num {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  margin-bottom: 5px;
+  color: var(--t1);
+}
+
+.m-fire .m-num { color: var(--fire-lt); }
+.m-ind  .m-num { color: var(--ind-lt); }
+
+.m-lbl {
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin-top: 6px;
+  color: var(--t3);
 }
 
-/* ─── INTERACTIVE CONTROL CARDS ──────────────────────────────────────────── */
-.control-card {
-  background: var(--glass);
-  border: 1px solid var(--rim);
-  border-radius: 16px;
-  padding: 18px;
+/* ── RATIO BAR ─────────────────────────────────────────── */
+.ratio-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 10px 12px;
+  flex-shrink: 0;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.45s ease, opacity 0.35s ease, padding 0.35s ease;
+}
+
+.ratio-wrap.open {
+  max-height: 60px;
+  opacity: 1;
+}
+
+.ratio-heads {
   display: flex;
-  flex-direction: column;
-  gap: 14px;
+  justify-content: space-between;
+  margin-bottom: 7px;
 }
 
-.control-header {
+.ratio-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.06em;
+  color: var(--t2);
+}
+
+.ratio-pip { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.ratio-pip.fire { background: var(--fire); }
+.ratio-pip.ind  { background: var(--ind); }
+
+.ratio-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--raised);
+  overflow: hidden;
+}
+
+.ratio-bar {
+  height: 100%;
+  border-radius: 2px;
+  width: 0;
+  transition: width 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ── PANEL ─────────────────────────────────────────────── */
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.panel-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--border);
 }
 
-.control-title {
-  font-family: var(--ff-display);
-  font-weight: 700;
-  font-size: 0.88rem;
-  letter-spacing: -0.01em;
-  color: var(--text-main);
+.panel-title {
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--t1);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+  letter-spacing: -0.01em;
 }
 
-.control-title span {
-  font-size: 1rem;
-}
+.ptitle-icon { opacity: 0.55; font-size: 0.85rem; }
 
-.control-tag {
-  font-family: var(--ff-mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.1em;
+.panel-tag {
+  font-family: var(--mono);
+  font-size: 0.48rem;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--mauve);
+  color: var(--t3);
 }
 
-.date-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.input-field-group {
+.panel-body {
+  padding: 12px 13px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.input-label {
-  font-family: var(--ff-mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.styled-input {
-  width: 100%;
-  padding: 10px 14px;
-  background: var(--surface);
-  border: 1px solid var(--rim);
-  border-radius: 12px;
-  color: var(--text-main);
-  font-family: var(--ff-mono);
-  font-size: 0.8rem;
-  outline: none;
-  transition: all 0.2s;
-  color-scheme: dark;
-}
-
-.styled-input:focus {
-  border-color: var(--mauve);
-  box-shadow: 0 0 0 3px rgba(206,147,216,0.15);
-}
-
-/* ─── COORDINATE MATRIX SELECTOR ─────────────────────────────────────────── */
-.coord-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
-.coord-box {
-  position: relative;
-  background: var(--surface);
-  border: 1px solid var(--rim);
-  border-radius: 12px;
-  padding: 8px 12px 8px 36px;
-  transition: border-color 0.2s;
+/* ── FIELD LABEL ───────────────────────────────────────── */
+.f-lbl {
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 5px;
 }
 
-.coord-box:focus-within {
-  border-color: var(--lavender);
-  box-shadow: 0 0 0 3px rgba(179,157,219,0.15);
-}
-
-.coord-indicator {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-family: var(--ff-mono);
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--blush);
-  pointer-events: none;
-}
-
-.coord-box input {
-  width: 100%;
-  background: none;
-  border: none;
-  color: var(--text-main);
-  font-family: var(--ff-mono);
-  font-size: 0.82rem;
-  outline: none;
-}
-
-/* ─── LIMIT SELECTOR CHIPS ───────────────────────────────────────────────── */
-.chip-row {
+/* ── DATE RANGE INPUT ──────────────────────────────────── */
+.date-range {
   display: flex;
+  align-items: flex-end;
   gap: 6px;
 }
 
-.selection-chip {
-  flex: 1;
-  padding: 8px 4px;
-  background: var(--surface);
-  border: 1px solid var(--rim);
-  border-radius: 10px;
-  color: var(--text-muted);
-  font-family: var(--ff-mono);
-  font-size: 0.72rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  user-select: none;
+.date-range .d-field { flex: 1; }
+
+.date-sep {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--t3);
+  padding-bottom: 8px;
+  flex-shrink: 0;
 }
 
-.selection-chip:hover {
-  border-color: var(--mauve);
-  color: var(--mauve);
-}
-
-.selection-chip.active {
-  background: linear-gradient(135deg, rgba(244,143,177,0.18), rgba(126,87,194,0.18));
-  border-color: var(--blush);
-  color: var(--peach);
-  box-shadow: 0 0 16px rgba(244,143,177,0.2);
-}
-
-/* ─── RUN CLASSIFICATION BUTTON (PEACH TO VIOLET GRADIENT) ────────────────── */
-.btn-launch {
-  position: relative;
+.inp {
   width: 100%;
-  padding: 14px;
-  border: none;
-  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 9px;
+  color: var(--t1);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  outline: none;
+  color-scheme: dark;
+  transition: border-color 0.14s, box-shadow 0.14s;
+  appearance: none;
+}
+
+.inp:focus {
+  border-color: rgba(201,114,80,0.5);
+  box-shadow: 0 0 0 2.5px rgba(201,114,80,0.12);
+}
+
+.inp[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5) opacity(0.5);
   cursor: pointer;
-  font-family: var(--ff-display);
-  font-weight: 700;
-  font-size: 0.92rem;
-  letter-spacing: 0.02em;
-  color: #fff;
-  overflow: hidden;
-  background: var(--grad-warm);
+}
+
+/* ── COMPASS BBOX SELECTOR ─────────────────────────────── */
+.compass {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.c-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.c-dir {
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  color: var(--t3);
+  width: 10px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.c-inp {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--t1);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.14s, box-shadow 0.14s;
+  appearance: textfield;
+}
+
+.c-inp::-webkit-inner-spin-button, .c-inp::-webkit-outer-spin-button { display: none; }
+
+.c-inp:focus {
+  border-color: rgba(201,114,80,0.48);
+  box-shadow: 0 0 0 2px rgba(201,114,80,0.1);
+}
+
+.c-inp.ns { width: 86px; padding: 6px 8px; }
+.c-inp.ew { width: 76px; padding: 6px 8px; }
+
+.compass-center {
+  width: 46px; height: 38px;
+  border: 1px solid var(--border-hi);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.compass-center::before, .compass-center::after {
+  content: '';
+  position: absolute;
+  background: var(--border-hi);
+}
+
+.compass-center::before { width: 1px; top: 7px; bottom: 7px; left: 50%; }
+.compass-center::after  { height: 1px; left: 7px; right: 7px; top: 50%; }
+
+.compass-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--fire);
+  opacity: 0.55;
+  position: relative; z-index: 1;
+}
+
+/* ── LIMIT CHIPS ───────────────────────────────────────── */
+.chips { display: flex; gap: 5px; }
+
+.chip {
+  flex: 1;
+  padding: 6px 4px;
+  text-align: center;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--t3);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.14s, background 0.14s, border-color 0.14s;
+}
+
+.chip:hover { color: var(--t2); border-color: var(--border-hi); }
+
+.chip.active {
+  color: var(--fire-lt);
+  background: var(--fire-dim);
+  border-color: rgba(201,114,80,0.3);
+}
+
+#class-filter button.class-filter-chip {
+  font-family: var(--sans);
+  color: var(--t2);
+}
+
+.class-filter-note {
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  line-height: 1.5;
+  color: var(--t3);
+}
+
+/* ── RUN BUTTON ────────────────────────────────────────── */
+.btn-run {
+  width: 100%;
+  padding: 11px 16px;
+  background: linear-gradient(135deg, var(--fire-dk) 0%, var(--fire) 45%, var(--fire-lt) 100%);
   background-size: 200% 200%;
-  animation: gradient-shift 5s ease infinite;
-  box-shadow: 0 10px 30px rgba(244,143,177,0.3);
-  transition: transform 0.2s, box-shadow 0.2s;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-family: var(--serif);
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 3px 18px rgba(144,78,48,0.45);
+  animation: btn-shift 8s ease-in-out infinite;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-.btn-launch:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 36px rgba(206,147,216,0.45);
-}
-
-.btn-launch:active { transform: translateY(0); }
-
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
+@keyframes btn-shift {
+  0%,100% { background-position: 0% 50%; }
   50%      { background-position: 100% 50%; }
 }
 
-/* ─── UPLOAD ZONE ────────────────────────────────────────────────────────── */
-.upload-dropzone {
-  border: 1.5px dashed var(--rim);
-  border-radius: 14px;
-  padding: 18px;
+.btn-run:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 26px rgba(144,78,48,0.6);
+}
+
+.btn-run:active { transform: translateY(0); }
+
+.btn-run-inner {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+
+/* ── DROPZONE ──────────────────────────────────────────── */
+.dz {
+  border: 1.5px dashed var(--border-hi);
+  border-radius: 8px;
+  padding: 13px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
   position: relative;
   background: var(--surface);
-  overflow: hidden;
+  transition: border-color 0.2s, background 0.2s;
 }
 
-.upload-dropzone:hover {
-  border-color: var(--mauve);
-  background: rgba(206,147,216,0.04);
-  box-shadow: 0 0 20px rgba(206,147,216,0.1);
+.dz:hover, .dz.over {
+  border-color: rgba(74,134,164,0.45);
+  background: var(--ind-dim);
 }
 
-.upload-dropzone input[type="file"] {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
+.dz input {
+  position: absolute; inset: 0;
+  opacity: 0; cursor: pointer;
+  width: 100%; height: 100%;
 }
 
-.upload-icon-wrap {
-  font-size: 1.4rem;
-  margin-bottom: 6px;
-}
+.dz-icon { font-size: 1.1rem; display: block; opacity: 0.45; margin-bottom: 4px; }
 
-.upload-label-text {
-  font-family: var(--ff-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
+.dz-txt {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
+  color: var(--t2);
 }
 
-.btn-upload-submit {
+.dz-file {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--ind-lt);
+  margin-top: 3px;
+  display: none;
+}
+
+.btn-sec {
   width: 100%;
-  padding: 10px;
-  border: 1px solid var(--violet);
-  border-radius: 12px;
-  background: rgba(126,87,194,0.12);
-  color: var(--mauve);
-  font-family: var(--ff-display);
-  font-weight: 600;
-  font-size: 0.82rem;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid rgba(74,134,164,0.3);
+  border-radius: 7px;
+  color: var(--ind-lt);
+  font-family: var(--sans);
+  font-size: 0.76rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-  letter-spacing: 0.02em;
-  margin-top: 10px;
-}
-.btn-upload-submit:hover {
-  background: rgba(126,87,194,0.25);
-  box-shadow: 0 0 20px rgba(126,87,194,0.3);
-  color: var(--text-main);
+  transition: background 0.14s, border-color 0.14s;
 }
 
-/* ─── LEGEND PANEL ───────────────────────────────────────────────────────── */
-.legend-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+.btn-sec:hover { background: var(--ind-dim); border-color: var(--ind); }
 
-.legend-card {
+/* ── LEGEND ────────────────────────────────────────────── */
+.legend { display: flex; flex-direction: column; gap: 5px; }
+
+.leg-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
+  gap: 9px;
+  padding: 7px 10px;
   background: var(--surface);
-  border-radius: 12px;
-  border: 1px solid var(--rim);
+  border: 1px solid var(--border);
+  border-radius: 7px;
 }
 
-.legend-beacon {
-  width: 12px;
-  height: 12px;
+.leg-pip {
+  width: 8px; height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
-.legend-beacon.wild { background: var(--fire); box-shadow: 0 0 12px rgba(255,111,89,0.7); }
-.legend-beacon.ind  { background: var(--lavender); box-shadow: 0 0 12px rgba(179,157,219,0.7); }
 
-.legend-desc {
-  flex: 1;
-  font-size: 0.78rem;
+.leg-pip.fire { background: var(--fire); box-shadow: 0 0 8px var(--fire-glow); }
+.leg-pip.ind  { background: var(--ind);  box-shadow: 0 0 8px var(--ind-glow); }
+
+.leg-name {
+  font-size: 0.75rem;
   font-weight: 500;
-  color: var(--text-main);
+  color: var(--t1);
+  flex: 1;
 }
 
-.legend-subtext {
-  font-family: var(--ff-mono);
-  font-size: 0.6rem;
-  color: var(--text-muted);
+.leg-note {
+  font-family: var(--mono);
+  font-size: 0.54rem;
+  color: var(--t3);
   letter-spacing: 0.04em;
-  display: block;
-  margin-top: 2px;
 }
 
-/* ─── DETECTION FEED LIST ────────────────────────────────────────────────── */
-.feed-header {
-  font-family: var(--ff-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
+/* ── DETECTION FEED ────────────────────────────────────── */
+.feed-lbl {
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  padding: 0 4px;
+  color: var(--t3);
 }
 
-#detection-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+.feed { display: flex; flex-direction: column; gap: 5px; }
 
-.feed-card {
-  background: var(--surface);
-  border: 1px solid var(--rim);
-  border-radius: 12px;
-  padding: 14px;
+.fc {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 11px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background 0.14s, border-color 0.14s, transform 0.14s;
   position: relative;
   overflow: hidden;
 }
 
-.feed-card::before {
+.fc::before {
   content: '';
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: var(--grad-hot);
+  width: 2px;
+  border-radius: 2px 0 0 2px;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.14s;
 }
 
-.feed-card.ind-card::before { background: var(--grad-cool); }
+.fc.fc-fire::before { background: linear-gradient(to bottom, var(--fire-lt), var(--fire)); }
+.fc.fc-ind::before  { background: linear-gradient(to bottom, var(--ind-lt), var(--ind)); }
 
-.feed-card:hover {
-  background: var(--glass);
-  border-color: var(--rim-glow);
-  transform: translateX(3px);
+.fc:hover {
+  background: var(--raised);
+  border-color: var(--border-hi);
+  transform: translateX(2px);
 }
-.feed-card:hover::before { opacity: 1; }
 
-.feed-card-header {
+.fc:hover::before { opacity: 1; }
+
+.fc-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.fc-badge {
+  font-family: var(--mono);
+  font-size: 0.54rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 100px;
+  font-weight: 500;
+}
+
+.fc-badge.fire { background: var(--fire-dim); color: var(--fire-lt); border: 1px solid rgba(201,114,80,0.22); }
+.fc-badge.ind  { background: var(--ind-dim);  color: var(--ind-lt);  border: 1px solid rgba(74,134,164,0.22); }
+
+.fc-idx { font-family: var(--mono); font-size: 0.54rem; color: var(--t3); }
+
+.fc-coords {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--t1);
+  letter-spacing: 0.02em;
+  margin-bottom: 5px;
+}
+
+.fc-meta {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 0.57rem;
+  color: var(--t2);
   margin-bottom: 6px;
 }
 
-.feed-badge {
-  font-family: var(--ff-mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: 100px;
-  font-weight: 600;
-}
+.conf-track { height: 2px; background: var(--raised); border-radius: 2px; overflow: hidden; }
 
-.feed-badge.wild {
-  background: rgba(255,111,89,0.15);
-  color: var(--ember);
-  border: 1px solid rgba(255,111,89,0.3);
-}
-
-.feed-badge.ind {
-  background: rgba(179,157,219,0.15);
-  color: var(--lavender);
-  border: 1px solid rgba(179,157,219,0.3);
-}
-
-.feed-index {
-  font-family: var(--ff-mono);
-  font-size: 0.62rem;
-  color: var(--text-muted);
-}
-
-.feed-coords {
-  font-family: var(--ff-mono);
-  font-size: 0.72rem;
-  color: var(--text-main);
-  letter-spacing: 0.02em;
-  margin-bottom: 8px;
-}
-
-.feed-stats-row {
-  display: flex;
-  gap: 12px;
-  font-family: var(--ff-mono);
-  font-size: 0.65rem;
-  color: var(--text-muted);
-}
-
-.feed-bar-track {
-  height: 3px;
+.conf-fill {
+  height: 100%;
   border-radius: 2px;
-  background: var(--rim);
-  margin-top: 10px;
-  overflow: hidden;
-  position: relative;
+  transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
 }
 
-.feed-bar-fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  border-radius: 2px;
-  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
+.fc-fire .conf-fill { background: linear-gradient(90deg, var(--fire-dk), var(--fire-lt)); }
+.fc-ind  .conf-fill { background: linear-gradient(90deg, var(--ind-dk), var(--ind-lt)); }
 
-/* ─── MAP CANVAS CONTAINER ───────────────────────────────────────────────── */
+/* ── MAP ───────────────────────────────────────────────── */
 #map {
   flex: 1;
-  background: #040208;
+  background: #071426;
+  position: relative;
   z-index: 1;
 }
 
-/* Leaflet Dark Theme Overlays */
-.leaflet-popup-content-wrapper {
-  background: var(--surface) !important;
-  border: 1px solid var(--rim) !important;
-  border-radius: 14px !important;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.7) !important;
-  color: var(--text-main) !important;
-  backdrop-filter: blur(12px);
+.country-label-marker {
+  background: transparent;
+  border: 0;
 }
-.leaflet-popup-tip { background: var(--surface) !important; }
-.leaflet-popup-content { margin: 0 !important; }
-.leaflet-container { font-family: var(--ff-body) !important; }
 
-/* Popup Card Structure */
-.popup-box { width: 230px; }
-.popup-top {
-  padding: 14px;
+.country-label {
+  color: #aebed0;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 4px #050b14, 1px 0 4px #050b14, -1px 0 4px #050b14;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Subtle inner vignette */
+#map::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(8,12,19,0.5) 100%);
+  pointer-events: none;
+  z-index: 450;
+}
+
+/* ── LEAFLET OVERRIDES ─────────────────────────────────── */
+.leaflet-popup-content-wrapper {
+  background: var(--card) !important;
+  border: 1px solid var(--border-hi) !important;
+  border-radius: 11px !important;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.88) !important;
+  color: var(--t1) !important;
+}
+
+.leaflet-popup-tip { background: var(--card) !important; }
+.leaflet-popup-content { margin: 0 !important; padding: 0 !important; }
+.leaflet-container { font-family: var(--sans) !important; }
+
+.leaflet-control-zoom { border: none !important; box-shadow: none !important; }
+
+.leaflet-control-zoom a {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--t2) !important;
+  width: 28px !important;
+  height: 28px !important;
+  line-height: 26px !important;
+  border-radius: 7px !important;
+  margin-bottom: 4px !important;
+  display: block !important;
+  transition: background 0.14s !important;
+  font-size: 16px !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--raised) !important;
+  color: var(--t1) !important;
+}
+
+.leaflet-bottom.leaflet-right { padding: 0 10px 10px 0; }
+
+.leaflet-control-attribution {
+  background: rgba(5,8,14,0.88) !important;
+  border-radius: 6px !important;
+  color: var(--t3) !important;
+  font-size: 9px !important;
+  border: 1px solid var(--border) !important;
+  padding: 2px 7px !important;
+}
+
+.leaflet-control-attribution a { color: var(--t2) !important; }
+
+/* ── HOVER TOOLTIP ─────────────────────────────────────── */
+#mtt {
+  position: fixed;
+  z-index: 2000;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  min-width: 186px;
+}
+
+#mtt.show { opacity: 1; transform: translateY(0); }
+
+.mtt-inner {
+  background: var(--card);
+  border: 1px solid var(--border-hi);
+  border-radius: 9px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.78);
+  backdrop-filter: blur(20px);
+}
+
+.mtt-top {
+  display: flex; align-items: center; gap: 7px;
+  margin-bottom: 6px;
+}
+
+.mtt-pip { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.mtt-pip.fire { background: var(--fire); box-shadow: 0 0 7px var(--fire-glow); }
+.mtt-pip.ind  { background: var(--ind);  box-shadow: 0 0 7px var(--ind-glow); }
+
+.mtt-type {
+  font-family: var(--serif);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--t1);
+}
+
+.mtt-coords {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--t2);
+  letter-spacing: 0.03em;
+  margin-bottom: 8px;
+}
+
+.mtt-stats {
+  display: flex;
+  gap: 14px;
+  border-top: 1px solid var(--border);
+  padding-top: 7px;
+}
+
+.mtt-stat { display: flex; flex-direction: column; gap: 2px; }
+
+.mtt-val {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--t1);
+}
+
+.mtt-key {
+  font-family: var(--mono);
+  font-size: 0.49rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--t3);
+}
+
+/* ── CLICK POPUP CARD ──────────────────────────────────── */
+.pc { width: 218px; }
+
+.pc-head {
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--rim);
-}
-.popup-type {
-  font-family: var(--ff-display);
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-.popup-type.wild { color: var(--ember); }
-.popup-type.ind  { color: var(--lavender); }
-.popup-confidence {
-  font-family: var(--ff-mono);
-  font-size: 0.65rem;
-  color: var(--text-muted);
 }
 
-.popup-body {
-  padding: 12px 14px;
-  display: flex;
-  gap: 12px;
-  align-items: center;
+.pc-type { font-family: var(--serif); font-size: 0.78rem; font-weight: 600; }
+.pc-type.fire { color: var(--fire-lt); }
+.pc-type.ind  { color: var(--ind-lt); }
+
+.pc-conf { font-family: var(--mono); font-size: 0.58rem; color: var(--t2); }
+
+.pc-rows {
+  padding: 10px 13px;
+  display: flex; flex-direction: column; gap: 5px;
 }
-.popup-img {
-  width: 68px;
-  height: 68px;
-  border-radius: 10px;
+
+.pc-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.62rem; }
+.pc-k { color: var(--t2); }
+.pc-v { color: var(--t1); font-weight: 500; }
+
+.pc-patch-row {
+  padding: 0 13px 11px;
+  display: flex; gap: 9px; align-items: flex-end;
+}
+
+.pc-patch {
+  width: 58px; height: 58px;
+  border-radius: 7px;
   image-rendering: pixelated;
-  border: 1px solid var(--rim);
+  border: 1px solid var(--border);
   flex-shrink: 0;
 }
-.popup-details {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-family: var(--ff-mono);
-  font-size: 0.62rem;
-  color: var(--text-muted);
-}
-.popup-details b { color: var(--text-main); font-weight: 500; }
 
-.popup-models-grid {
-  padding: 10px 14px 14px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  border-top: 1px solid var(--rim);
-}
-.popup-model-cell { text-align: center; }
-.popup-model-bar-box {
-  height: 28px;
+.pc-models {
+  flex: 1;
   display: flex;
   align-items: flex-end;
-  justify-content: center;
+  gap: 4px;
+  height: 46px;
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
 }
-.popup-model-bar {
-  width: 10px;
-  border-radius: 3px 3px 0 0;
-  background: var(--grad-cool);
+
+.pcm { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; justify-content: flex-end; }
+
+.pcm-bar {
+  width: 100%;
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+  background: linear-gradient(to top, var(--ind-dk), var(--ind));
 }
-.popup-model-label {
-  font-family: var(--ff-mono);
-  font-size: 0.5rem;
+
+.pcm-lbl {
+  font-family: var(--mono);
+  font-size: 0.43rem;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin-top: 4px;
+  color: var(--t3);
 }
 
-/* ─── FIRE & THERMAL PARTICLE ANIMATION OVERLAY ──────────────────────────── */
-#thermal-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 600;
+/* ── LOADING ───────────────────────────────────────────── */
+#loading {
+  position: fixed; inset: 0;
+  background: rgba(8,12,19,0.84);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
   display: none;
-}
-#thermal-overlay.active { display: block; }
-#thermal-canvas { width: 100%; height: 100%; display: block; }
-
-/* ─── IMMERSIVE ALERT BANNER ─────────────────────────────────────────────── */
-#intel-banner {
-  position: fixed;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-30px);
-  z-index: 700;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  min-width: 320px;
-  max-width: 480px;
-}
-
-#intel-banner.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-.intel-box {
-  background: var(--surface);
-  border: 1px solid var(--rim);
-  border-radius: 16px;
-  padding: 16px 20px;
-  display: flex;
   align-items: center;
-  gap: 16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(16px);
-}
-
-.intel-box::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--grad-warm);
-  opacity: 0.06;
-  pointer-events: none;
-}
-
-.intel-icon {
-  font-size: 2.2rem;
-  flex-shrink: 0;
-  animation: flame-flicker 0.8s ease-in-out infinite alternate;
-}
-
-@keyframes flame-flicker {
-  from { transform: scale(1) rotate(-4deg); filter: brightness(1); }
-  to   { transform: scale(1.15) rotate(4deg); filter: brightness(1.4); }
-}
-
-.intel-content { flex: 1; }
-.intel-title {
-  font-family: var(--ff-display);
-  font-weight: 700;
-  font-size: 1rem;
-  background: var(--grad-warm);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.intel-title.ind-title {
-  background: var(--grad-cool);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.intel-sub {
-  font-family: var(--ff-mono);
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  letter-spacing: 0.06em;
-  margin-top: 3px;
-  text-transform: uppercase;
-}
-
-/* ─── LOADING VEIL ───────────────────────────────────────────────────────── */
-#loading-veil {
-  position: fixed;
-  inset: 0;
-  background: rgba(6,4,12,0.75);
-  backdrop-filter: blur(8px);
-  z-index: 800;
-  display: none;
+  justify-content: center;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
+  gap: 13px;
 }
-#loading-veil.active { display: flex; }
 
-.loading-spinner {
-  width: 56px;
-  height: 56px;
+#loading.on { display: flex; }
+
+.loading-ring {
+  width: 42px; height: 42px;
   border-radius: 50%;
-  border: 2px solid var(--rim);
-  border-top-color: var(--blush);
-  border-right-color: var(--mauve);
-  animation: spin 0.9s linear infinite;
+  border: 1.5px solid var(--border-hi);
+  border-top-color: var(--fire-lt);
+  border-right-color: var(--fire);
+  animation: spin 0.75s linear infinite;
 }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.loading-text {
-  font-family: var(--ff-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
+.loading-txt {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--t2);
 }
 
-/* ─── TOAST NOTIFICATION ─────────────────────────────────────────────────── */
+/* ── BANNER ────────────────────────────────────────────── */
+#banner {
+  position: fixed;
+  top: 66px; left: 50%;
+  transform: translateX(-50%) translateY(-12px);
+  z-index: 900;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.36s cubic-bezier(0.16,1,0.3,1),
+              transform 0.36s cubic-bezier(0.16,1,0.3,1);
+}
+
+#banner.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.banner-box {
+  background: var(--card);
+  border: 1px solid var(--border-hi);
+  border-radius: 12px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 14px 44px rgba(0,0,0,0.82);
+  backdrop-filter: blur(18px);
+  min-width: 270px;
+  max-width: 400px;
+}
+
+.banner-icon {
+  font-size: 1.7rem; flex-shrink: 0;
+  animation: sway 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes sway {
+  from { transform: scale(1) rotate(-3deg); }
+  to   { transform: scale(1.07) rotate(3deg); }
+}
+
+.banner-title {
+  font-family: var(--serif);
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.banner-title.fire-t { color: var(--fire-lt); }
+.banner-title.ind-t  { color: var(--ind-lt); }
+
+.banner-sub {
+  font-family: var(--mono);
+  font-size: 0.57rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--t2);
+}
+
+/* ── TOAST ─────────────────────────────────────────────── */
 #toast {
   position: fixed;
-  bottom: 28px;
-  right: 28px;
-  padding: 12px 20px;
-  background: var(--glass);
-  border: 1px solid var(--rim);
-  border-radius: 12px;
-  font-family: var(--ff-mono);
-  font-size: 0.75rem;
+  bottom: 18px; right: 18px;
+  background: var(--raised);
+  border: 1px solid var(--border-hi);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: var(--mono);
+  font-size: 0.66rem;
   letter-spacing: 0.04em;
-  color: var(--text-main);
-  z-index: 999;
+  color: var(--t1);
+  z-index: 2000;
   opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(7px);
+  transition: all 0.22s ease;
   pointer-events: none;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.65);
 }
-#toast.show { opacity: 1; transform: translateY(0); }
 
-.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+#toast.show { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
 
-<!-- Thermal Particle Overlay -->
-<div id="thermal-overlay" aria-hidden="true">
-  <canvas id="thermal-canvas"></canvas>
+<!-- Loading overlay -->
+<div id="loading" role="status">
+  <div class="loading-ring"></div>
+  <div class="loading-txt" id="loading-txt">Executing classification models</div>
 </div>
 
-<!-- Loading Veil -->
-<div id="loading-veil" role="status" aria-live="polite">
-  <div class="loading-spinner"></div>
-  <div class="loading-text">Executing Tensor Inference Models...</div>
+<!-- Notification banner -->
+<div id="banner" role="alert">
+  <div class="banner-box">
+    <span class="banner-icon" id="b-icon">🔥</span>
+    <div>
+      <div class="banner-title" id="b-title"></div>
+      <div class="banner-sub"  id="b-sub"></div>
+    </div>
+  </div>
 </div>
 
-<!-- Immersive Intel Banner -->
-<div id="intel-banner" role="alert" aria-live="assertive">
-  <div class="intel-box">
-    <div class="intel-icon" id="intel-icon">🔥</div>
-    <div class="intel-content">
-      <div class="intel-title" id="intel-title">Wildfire Anomaly Detected</div>
-      <div class="intel-sub" id="intel-sub">Thermal Signature Verified</div>
+<!-- Hover tooltip -->
+<div id="mtt" aria-hidden="true">
+  <div class="mtt-inner">
+    <div class="mtt-top">
+      <div class="mtt-pip" id="tt-pip"></div>
+      <div class="mtt-type" id="tt-type"></div>
+    </div>
+    <div class="mtt-coords" id="tt-coords"></div>
+    <div class="mtt-stats">
+      <div class="mtt-stat">
+        <span class="mtt-val" id="tt-bright">—</span>
+        <span class="mtt-key">Brightness</span>
+      </div>
+      <div class="mtt-stat">
+        <span class="mtt-val" id="tt-frp">—</span>
+        <span class="mtt-key">FRP</span>
+      </div>
+      <div class="mtt-stat">
+        <span class="mtt-val" id="tt-conf">—</span>
+        <span class="mtt-key">Confidence</span>
+      </div>
     </div>
   </div>
 </div>
@@ -909,197 +1100,587 @@ header::after {
 
 <!-- Header -->
 <header>
-  <div class="brand">
-    <div class="brand-icon" aria-hidden="true">🛰</div>
-    <span class="brand-name">Aegis Thermal</span>
+  <a href="/" class="brand">
+    <div class="brand-mark">🛰</div>
+    <div class="brand-text">
+      <span class="brand-name">Agni</span>
+      <span class="brand-sub">VIIRS Neural Intelligence</span>
+    </div>
+  </a>
+
+  <div class="live-pill">
+    <div class="live-dot"></div>
+    VIIRS Feed
   </div>
-  <div class="system-badge">VIIRS Neural Fusion System</div>
-  <div class="header-spacer"></div>
-  <a href="/" class="nav-link nav-pill active">Command Map</a>
-  <a href="/about/" class="nav-link nav-pill">Architecture</a>
+
+  <div class="h-sep"></div>
+
+  <a href="/" class="nav-link active">Command Map</a>
+  <a href="/about/" class="nav-link">Architecture</a>
 </header>
 
-<!-- Workspace Layout -->
+<!-- Workspace -->
 <div class="workspace">
 
-  <!-- Command Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-scroll">
+  <!-- Sidebar -->
+  <aside>
+    <div class="sb-scroll">
 
-      <!-- Telemetry Metrics -->
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-value" id="stat-total">--</div>
-          <div class="metric-label">Scanned</div>
+      <!-- Metrics -->
+      <div class="metrics">
+        <div class="m-tile m-total">
+          <div class="m-num" id="stat-total">—</div>
+          <div class="m-lbl">Scanned</div>
         </div>
-        <div class="metric-card">
-          <div class="metric-value wild-metric" id="stat-wild">--</div>
-          <div class="metric-label">Wildfires</div>
+        <div class="m-tile m-fire">
+          <div class="m-num" id="stat-wild">—</div>
+          <div class="m-lbl">Wildfires</div>
         </div>
-        <div class="metric-card">
-          <div class="metric-value ind-metric" id="stat-ind">--</div>
-          <div class="metric-label">Industrial</div>
+        <div class="m-tile m-ind">
+          <div class="m-num" id="stat-ind">—</div>
+          <div class="m-lbl">Industrial</div>
         </div>
       </div>
 
-      <!-- Time Window Selection -->
-      <div class="control-card">
-        <div class="control-header">
-          <div class="control-title"><span>⏳</span> Temporal Span</div>
-          <span class="control-tag">Filter</span>
+      <!-- Map filters -->
+      <div class="panel" id="map-filter-panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="ptitle-icon">⌖</span> Map Filters
+          </div>
+          <span class="panel-tag">Dates · Area · Type</span>
         </div>
-        <div class="date-row">
-          <div class="input-field-group">
-            <label class="input-label" for="date-from">Start Date</label>
-            <input type="date" id="date-from" class="styled-input" value="{{ date_min }}">
+        <div class="panel-body">
+          <div>
+            <div class="f-lbl">Show detections</div>
+            <div class="chips" id="class-filter" role="group" aria-label="Filter detections by type">
+              <button type="button" class="chip class-filter-chip active" data-class="all" aria-pressed="true">All</button>
+              <button type="button" class="chip class-filter-chip" data-class="wildfire" aria-pressed="false">Wildfire</button>
+              <button type="button" class="chip class-filter-chip" data-class="industrial" aria-pressed="false">Industrial</button>
+            </div>
           </div>
-          <div class="input-field-group">
-            <label class="input-label" for="date-to">End Date</label>
-            <input type="date" id="date-to" class="styled-input" value="{{ date_max }}">
-          </div>
+          <div class="class-filter-note">Set the date range and geographic bounds below, then execute the query.</div>
         </div>
       </div>
 
-      <!-- Spatial Coordinate Command Selector -->
-      <div class="control-card">
-        <div class="control-header">
-          <div class="control-title"><span>🗺️</span> Spatial Sector</div>
-          <span class="control-tag">Bounding Box</span>
-        </div>
-        
-        <div class="input-field-group">
-          <label class="input-label">Latitude Range</label>
-          <div class="coord-grid">
-            <div class="coord-box">
-              <span class="coord-indicator">MIN</span>
-              <input type="number" id="lat-min" value="8" step="0.1" placeholder="8">
-            </div>
-            <div class="coord-box">
-              <span class="coord-indicator">MAX</span>
-              <input type="number" id="lat-max" value="38" step="0.1" placeholder="38">
-            </div>
+      <!-- Ratio bar — revealed after data loads -->
+      <div class="ratio-wrap" id="ratio-wrap">
+        <div class="ratio-heads">
+          <div class="ratio-head">
+            <div class="ratio-pip fire"></div>
+            Wildfire <strong id="r-fire-pct" style="color:var(--t1);margin-left:2px">—</strong>%
+          </div>
+          <div class="ratio-head">
+            Industrial <strong id="r-ind-pct" style="color:var(--t1);margin-right:2px">—</strong>%
+            <div class="ratio-pip ind"></div>
           </div>
         </div>
-
-        <div class="input-field-group">
-          <label class="input-label">Longitude Range</label>
-          <div class="coord-grid">
-            <div class="coord-box">
-              <span class="coord-indicator">MIN</span>
-              <input type="number" id="lon-min" value="68" step="0.1" placeholder="68">
-            </div>
-            <div class="coord-box">
-              <span class="coord-indicator">MAX</span>
-              <input type="number" id="lon-max" value="104" step="0.1" placeholder="104">
-            </div>
-          </div>
+        <div class="ratio-track">
+          <div class="ratio-bar" id="ratio-bar"></div>
         </div>
-
-        <div class="input-field-group">
-          <label class="input-label">Detection Batch Limit</label>
-          <div class="chip-row" id="limit-chips">
-            <div class="selection-chip" data-val="100">100</div>
-            <div class="selection-chip active" data-val="200">200</div>
-            <div class="selection-chip" data-val="300">300</div>
-            <div class="selection-chip" data-val="500">500</div>
-          </div>
-        </div>
-
-        <button class="btn-launch" onclick="queryBuiltIn()" id="run-btn">
-          Execute Neural Classification
-        </button>
       </div>
 
-      <!-- CSV Upload Gateway -->
-      <div class="control-card">
-        <div class="control-header">
-          <div class="control-title"><span>📂</span> Ingest Swath Data</div>
-          <span class="control-tag">Custom CSV</span>
-        </div>
-        <div class="upload-dropzone" id="upload-zone">
-          <input type="file" id="csv-file" accept=".csv" aria-label="Upload FIRMS CSV">
-          <div class="upload-icon-wrap" aria-hidden="true">📥</div>
-          <div class="upload-label-text" id="upload-label">Drop FIRMS CSV here</div>
-        </div>
-        <button class="btn-upload-submit" onclick="uploadCSV()">Process Ingested Swath</button>
-      </div>
-
-      <!-- Classification Legend -->
-      <div class="control-card">
-        <div class="control-header">
-          <div class="control-title"><span>🏷️</span> Signature Legend</div>
-        </div>
-        <div class="legend-group">
-          <div class="legend-card">
-            <div class="legend-beacon wild"></div>
-            <div class="legend-desc">
-              Wildfire Anomaly
-              <span class="legend-subtext">Irregular thermal spread, diurnal peak</span>
-            </div>
+      <!-- Temporal span -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="ptitle-icon">⏱</span> Temporal Span
           </div>
-          <div class="legend-card">
-            <div class="legend-beacon ind"></div>
-            <div class="legend-desc">
-              Industrial Hotspot
-              <span class="legend-subtext">Stable continuous radiant power 24/7</span>
+          <span class="panel-tag">Date Filter</span>
+        </div>
+        <div class="panel-body">
+          <div>
+            <div class="f-lbl">Date window</div>
+            <div class="date-range">
+              <div class="d-field">
+                <input type="date" id="date-from" class="inp" value="{{ date_min }}" aria-label="Start date">
+              </div>
+              <span class="date-sep">–</span>
+              <div class="d-field">
+                <input type="date" id="date-to" class="inp" value="{{ date_max }}" aria-label="End date">
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Realtime Detection Feed -->
-      <div class="feed-header" id="det-count">Awaiting spatial query execution</div>
-      <div id="detection-list"></div>
+      <!-- Spatial sector -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="ptitle-icon">🗺</span> Spatial Sector
+          </div>
+          <span class="panel-tag">Bounding Box</span>
+        </div>
+        <div class="panel-body">
+
+          <div>
+            <div class="f-lbl">Geographic bounds</div>
+            <div class="compass">
+              <!-- North -->
+              <div class="c-row">
+                <span class="c-dir">N</span>
+                <input type="number" id="lat-max" class="c-inp ns" value="38" step="0.1" placeholder="38.0" aria-label="North latitude">
+              </div>
+              <!-- Middle row: W — center — E -->
+              <div class="c-row">
+                <span class="c-dir">W</span>
+                <input type="number" id="lon-min" class="c-inp ew" value="68" step="0.1" placeholder="68.0" aria-label="West longitude">
+                <div class="compass-center"><div class="compass-dot"></div></div>
+                <input type="number" id="lon-max" class="c-inp ew" value="104" step="0.1" placeholder="104.0" aria-label="East longitude">
+                <span class="c-dir">E</span>
+              </div>
+              <!-- South -->
+              <div class="c-row">
+                <span class="c-dir">S</span>
+                <input type="number" id="lat-min" class="c-inp ns" value="8" step="0.1" placeholder="8.0" aria-label="South latitude">
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="f-lbl">Detection limit</div>
+            <div class="chips" id="limit-chips">
+              <div class="chip" data-val="100">100</div>
+              <div class="chip active" data-val="200">200</div>
+              <div class="chip" data-val="300">300</div>
+              <div class="chip" data-val="500">500</div>
+            </div>
+          </div>
+
+          <button class="btn-run" id="run-btn" onclick="queryBuiltIn()">
+            <div class="btn-run-inner">
+              <span>⚡</span> Execute Classification
+            </div>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- CSV Upload -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="ptitle-icon">📂</span> Ingest Swath Data
+          </div>
+          <span class="panel-tag">CSV Upload</span>
+        </div>
+        <div class="panel-body">
+          <div class="dz" id="dropzone">
+            <input type="file" id="csv-file" accept=".csv" aria-label="Upload FIRMS CSV">
+            <span class="dz-icon">📡</span>
+            <div class="dz-txt">Drop FIRMS CSV here or click to browse</div>
+            <div class="dz-file" id="dz-file"></div>
+          </div>
+          <button class="btn-sec" onclick="uploadCSV()">Process Swath Data</button>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="ptitle-icon">🏷</span> Signature Legend
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="legend">
+            <div class="leg-item">
+              <div class="leg-pip fire"></div>
+              <span class="leg-name">Wildfire Event</span>
+              <span class="leg-note">Diurnal · spread</span>
+            </div>
+            <div class="leg-item">
+              <div class="leg-pip ind"></div>
+              <span class="leg-name">Industrial Source</span>
+              <span class="leg-note">Stable · 24/7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detection feed -->
+      <div class="feed-lbl" id="feed-lbl">Awaiting spatial query</div>
+      <div class="feed" id="feed"></div>
 
     </div>
   </aside>
 
-  <!-- Interactive Map Workspace -->
-  <div id="map" role="main" aria-label="Thermal telemetry map"></div>
+  <!-- Map -->
+  <div id="map" role="main" aria-label="Thermal detection map"></div>
 
 </div>
 
 <script>
-/* ── MAP INITIALIZATION ──────────────────────────────────────────────────── */
+/* ── MAP INIT ─────────────────────────────────────────── */
 const map = L.map('map', {
   center: [22, 82],
   zoom: 5,
-  preferCanvas: true,
   zoomControl: false
 });
 
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-/* Public Esri street tiles do not require an API key. */
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-  attribution: 'Tiles &copy; Esri — Sources: Esri, TomTom, Garmin, FAO, NOAA, USGS, OpenStreetMap contributors, and the GIS User Community',
-  maxZoom: 19
-}).addTo(map);
+map.attributionControl.addAttribution(
+  'Country boundaries © <a href="https://www.naturalearthdata.com/">Natural Earth</a>'
+);
 
-const markersLayer = L.layerGroup().addTo(map);
+const countryLabelLayer = L.layerGroup().addTo(map);
+let countryFeatures = [];
+
+function updateCountryLabels() {
+  countryLabelLayer.clearLayers();
+  const zoom = map.getZoom();
+  if (zoom < 3) return;
+
+  const maxLabelRank = zoom >= 5 ? 8 : zoom >= 4 ? 6 : 4;
+  const bounds = map.getBounds();
+  countryFeatures.forEach(feature => {
+    const properties = feature.properties;
+    const longitude = Number(properties.label_x);
+    const latitude = Number(properties.label_y);
+    if (!properties.name || !Number.isFinite(longitude) || !Number.isFinite(latitude)) return;
+    if (Number(properties.label_rank) > maxLabelRank || !bounds.contains([latitude, longitude])) return;
+
+    const label = document.createElement('span');
+    label.className = 'country-label';
+    label.textContent = properties.name;
+    countryLabelLayer.addLayer(L.marker([latitude, longitude], {
+      interactive: false,
+      keyboard: false,
+      icon: L.divIcon({
+        className: 'country-label-marker',
+        html: label.outerHTML,
+        iconSize: null
+      })
+    }));
+  });
+}
+
+fetch('/api/world-outline/')
+  .then(response => {
+    if (!response.ok) throw new Error(`World outline request failed (${response.status})`);
+    return response.json();
+  })
+  .then(outline => {
+    countryFeatures = outline.features || [];
+    L.geoJSON(outline, {
+      interactive: false,
+      style: {
+        color: '#354a64',
+        weight: 1,
+        opacity: 0.95,
+        dashArray: '2 3',
+        fillColor: '#0b192b',
+        fillOpacity: 1
+      }
+    }).addTo(map);
+    updateCountryLabels();
+  })
+  .catch(error => {
+    console.error('Unable to load the world outline:', error);
+    notify('The English world outline could not be loaded.');
+  });
+
+const markerLayer = L.layerGroup().addTo(map);
 let heatLayer = null;
-let selectedLimit = 200;
+let selLimit  = 200;
+let selectedClass = 'all';
+let renderedDetections = [];
 
-/* ── LIMIT CHIP INTERACTION ──────────────────────────────────────────────── */
-document.querySelectorAll('.selection-chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    document.querySelectorAll('.selection-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    selectedLimit = parseInt(chip.dataset.val);
+document.querySelectorAll('#class-filter .chip').forEach(button => {
+  button.addEventListener('click', () => {
+    selectedClass = button.dataset.class;
+    document.querySelectorAll('#class-filter .chip').forEach(chip => {
+      const active = chip === button;
+      chip.classList.toggle('active', active);
+      chip.setAttribute('aria-pressed', String(active));
+    });
+
+    let visibleCount = 0;
+    const visibleHeatPoints = [];
+    renderedDetections.forEach(detection => {
+      const visible = selectedClass === 'all' || detection.label === selectedClass;
+      if (visible) {
+        visibleCount += 1;
+        visibleHeatPoints.push(detection.heatPoint);
+        markerLayer.addLayer(detection.marker);
+      } else {
+        markerLayer.removeLayer(detection.marker);
+      }
+      detection.card.hidden = !visible;
+    });
+
+    if (heatLayer) heatLayer.setLatLngs(visibleHeatPoints);
+    const shown = selectedClass === 'all' ? 'all' : selectedClass;
+    document.getElementById('feed-lbl').textContent =
+      `${visibleCount.toLocaleString()} ${shown} detections shown`;
   });
 });
 
-/* ── FILE INPUT HANDLER ──────────────────────────────────────────────────── */
-document.getElementById('csv-file').addEventListener('change', e => {
-  const f = e.target.files[0];
-  document.getElementById('upload-label').textContent = f ? f.name : 'Drop FIRMS CSV here';
+/* ── CHIP SELECTION ───────────────────────────────────── */
+document.querySelectorAll('#limit-chips .chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('#limit-chips .chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    selLimit = parseInt(c.dataset.val, 10);
+  });
 });
 
-/* ── UTILITIES ───────────────────────────────────────────────────────────── */
-function showLoading() { document.getElementById('loading-veil').classList.add('active'); }
-function hideLoading() { document.getElementById('loading-veil').classList.remove('active'); }
+/* ── FILE INPUT ───────────────────────────────────────── */
+const csvInput   = document.getElementById('csv-file');
+const dzFile     = document.getElementById('dz-file');
+const dzEl       = document.getElementById('dropzone');
 
-function toast(msg, dur = 3000) {
+csvInput.addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (f) { dzFile.textContent = f.name; dzFile.style.display = 'block'; }
+});
+
+dzEl.addEventListener('dragover', e => { e.preventDefault(); dzEl.classList.add('over'); });
+dzEl.addEventListener('dragleave', ()  => dzEl.classList.remove('over'));
+dzEl.addEventListener('drop', ()       => dzEl.classList.remove('over'));
+
+/* ── HOVER TOOLTIP ────────────────────────────────────── */
+const mtt      = document.getElementById('mtt');
+const ttPip    = document.getElementById('tt-pip');
+const ttType   = document.getElementById('tt-type');
+const ttCoords = document.getElementById('tt-coords');
+const ttBright = document.getElementById('tt-bright');
+const ttFrp    = document.getElementById('tt-frp');
+const ttConf   = document.getElementById('tt-conf');
+
+function positionTT(cx, cy) {
+  const W = 200;
+  let x = cx + 18, y = cy - 12;
+  if (x + W > window.innerWidth - 8) x = cx - W - 14;
+  mtt.style.left = x + 'px';
+  mtt.style.top  = y + 'px';
+}
+
+function showTT(e, lat, lon, p, isInd) {
+  positionTT(e.originalEvent.clientX, e.originalEvent.clientY);
+  ttPip.className   = 'mtt-pip ' + (isInd ? 'ind' : 'fire');
+  ttType.textContent   = isInd ? 'Industrial Source' : 'Wildfire Event';
+  ttCoords.textContent = `${lat.toFixed(4)}° N  ${Math.abs(lon).toFixed(4)}° ${lon < 0 ? 'W' : 'E'}`;
+  ttBright.textContent = `${(+p.brightness).toFixed(0)} K`;
+  ttFrp.textContent    = `${(+p.frp).toFixed(1)} MW`;
+  ttConf.textContent   = `${(+p.confidence).toFixed(0)}%`;
+  mtt.classList.add('show');
+}
+
+function hideTT() { mtt.classList.remove('show'); }
+function moveTT(e)  { positionTT(e.originalEvent.clientX, e.originalEvent.clientY); }
+
+/* ── RENDER GEOJSON ───────────────────────────────────── */
+function renderGeoJSON(gj) {
+  markerLayer.clearLayers();
+  renderedDetections = [];
+  if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+
+  if (!gj.features?.length) {
+    notify('No thermal anomalies detected in this sector');
+    hideLoad();
+    return;
+  }
+
+  const meta  = gj.meta || {};
+  const total = gj.features.length;
+  const wild  = meta.wildfires  || 0;
+  const ind   = meta.industrial || 0;
+
+  countUp('stat-total', total);
+  countUp('stat-wild',  wild);
+  countUp('stat-ind',   ind);
+
+  /* Ratio bar */
+  if (total > 0) {
+    const fp  = Math.round(wild / total * 100);
+    const ip  = 100 - fp;
+    const b   = 7; // blend zone
+    const b1  = Math.max(1, fp - b);
+    const b2  = Math.min(99, fp + b);
+
+    document.getElementById('r-fire-pct').textContent = fp;
+    document.getElementById('r-ind-pct').textContent  = ip;
+
+    const bar = document.getElementById('ratio-bar');
+    bar.style.background =
+      `linear-gradient(to right, var(--fire-dk) 0%, var(--fire) ${b1}%, var(--fire-lt) ${fp}%,` +
+      ` var(--ind-lt) ${fp}%, var(--ind) ${b2}%, var(--ind-dk) 100%)`;
+
+    const wrap = document.getElementById('ratio-wrap');
+    wrap.classList.add('open');
+    /* Kick off width transition on next frame */
+    requestAnimationFrame(() => { bar.style.transition = 'width 0.9s cubic-bezier(0.16,1,0.3,1)'; bar.style.width = '100%'; });
+  }
+
+  const heatPts = [];
+  const feed    = document.getElementById('feed');
+  feed.innerHTML = '';
+  document.getElementById('feed-lbl').textContent = `${total.toLocaleString()} detections loaded`;
+
+  gj.features.forEach((f, i) => {
+    const p     = f.properties;
+    const lat   = f.geometry.coordinates[1];
+    const lon   = f.geometry.coordinates[0];
+    const isInd = p.label === 'industrial';
+    const r     = Math.max(4, Math.min(13, p.marker_size || 6));
+    const conf  = Math.min(100, +(p.confidence || 0));
+
+    const detectionLabel = isInd ? 'industrial' : 'wildfire';
+    const isVisible = selectedClass === 'all' || selectedClass === detectionLabel;
+    const m = L.circleMarker([lat, lon], {
+      radius:      r,
+      fillColor:   isInd ? '#4a86a4' : '#c97250',
+      color:       isInd ? '#74aec8' : '#e09a76',
+      weight:      1.5,
+      opacity:     1,
+      fillOpacity: 0.72
+    });
+    if (isVisible) m.addTo(markerLayer);
+
+    m.on('mouseover', e => {
+      m.setStyle({ fillOpacity: 0.96, weight: 2.5, radius: r + 2 });
+      showTT(e, lat, lon, p, isInd);
+    });
+    m.on('mouseout', () => {
+      m.setStyle({ fillOpacity: 0.72, weight: 1.5, radius: r });
+      hideTT();
+    });
+    m.on('mousemove', e => moveTT(e));
+
+    /* Click popup */
+    const patchRow = p.patch_b64 ? `
+      <div class="pc-patch-row">
+        <img src="data:image/png;base64,${p.patch_b64}" class="pc-patch" alt="Thermal patch">
+        <div class="pc-models">
+          ${ ['pca','cnn','firms','hybrid'].map(k => {
+            const h = Math.max(2, ((p[`${k}_prob`] || 0) * 42));
+            return `<div class="pcm"><div class="pcm-bar" style="height:${h}px"></div><div class="pcm-lbl">${k}</div></div>`;
+          }).join('') }
+        </div>
+      </div>` : '';
+
+    m.bindPopup(`
+      <div class="pc">
+        <div class="pc-head">
+          <span class="pc-type ${isInd ? 'ind' : 'fire'}">${isInd ? 'Industrial Source' : 'Wildfire Event'}</span>
+          <span class="pc-conf">${conf.toFixed(0)}% conf.</span>
+        </div>
+        <div class="pc-rows">
+          <div class="pc-row"><span class="pc-k">Coordinates</span><span class="pc-v">${lat.toFixed(4)}, ${lon.toFixed(4)}</span></div>
+          <div class="pc-row"><span class="pc-k">Brightness</span><span class="pc-v">${(+p.brightness).toFixed(1)} K</span></div>
+          <div class="pc-row"><span class="pc-k">Fire Radiative Power</span><span class="pc-v">${(+p.frp).toFixed(1)} MW</span></div>
+          <div class="pc-row"><span class="pc-k">Date acquired</span><span class="pc-v">${String(p.acq_date).slice(0,10)}</span></div>
+        </div>
+        ${patchRow}
+      </div>
+    `, { maxWidth: 260 });
+
+    const heatPoint = [lat, lon, Math.min(1, (+p.frp) / 200)];
+    heatPts.push({ label: isInd ? 'industrial' : 'wildfire', point: heatPoint });
+
+    /* Feed card */
+    const card = document.createElement('div');
+    card.className = `fc ${isInd ? 'fc-ind' : 'fc-fire'}`;
+    card.hidden = !isVisible;
+    card.innerHTML = `
+      <div class="fc-top">
+        <span class="fc-badge ${isInd ? 'ind' : 'fire'}">${isInd ? 'Industrial' : 'Wildfire'}</span>
+        <span class="fc-idx">#${i + 1}</span>
+      </div>
+      <div class="fc-coords">${lat.toFixed(4)}°  ${Math.abs(lon).toFixed(4)}° ${lon < 0 ? 'W' : 'E'}</div>
+      <div class="fc-meta">
+        <span>${(+p.brightness).toFixed(0)} K</span>
+        <span>${(+p.frp).toFixed(0)} MW</span>
+        <span>${String(p.acq_date).slice(0,10)}</span>
+      </div>
+      <div class="conf-track"><div class="conf-fill" style="width:${conf}%"></div></div>
+    `;
+    card.addEventListener('click', () => { hideTT(); map.setView([lat, lon], 10); m.openPopup(); });
+    feed.appendChild(card);
+    renderedDetections.push({
+      label: detectionLabel,
+      marker: m,
+      card,
+      heatPoint
+    });
+  });
+
+  /* Heat layer — warm yellow-orange thermal spectrum */
+  const visibleHeatPoints = heatPts
+    .filter(detection => selectedClass === 'all' || detection.label === selectedClass)
+    .map(detection => detection.point);
+  heatLayer = L.heatLayer(visibleHeatPoints, {
+    radius: 26,
+    blur: 20,
+    maxZoom: 10,
+    gradient: {
+      0:    'rgba(0,0,0,0)',
+      0.18: '#180a02',
+      0.38: '#6e2c0a',
+      0.58: '#b85a18',
+      0.76: '#d88828',
+      0.88: '#ecca48',
+      1:    '#fef280'
+    }
+  }).addTo(map);
+  const visibleCount = renderedDetections.filter(detection =>
+    selectedClass === 'all' || detection.label === selectedClass
+  ).length;
+  document.getElementById('feed-lbl').textContent =
+    `${visibleCount.toLocaleString()} ${selectedClass === 'all' ? 'all' : selectedClass} detections shown`;
+
+  const coords = gj.features.map(f => [f.geometry.coordinates[1], f.geometry.coordinates[0]]);
+  if (coords.length) map.fitBounds(coords, { padding: [50, 50] });
+
+  hideLoad();
+  setTimeout(() => showBanner(wild, ind), 320);
+  notify(`${total.toLocaleString()} thermal signatures classified`);
+}
+
+/* ── BANNER ───────────────────────────────────────────── */
+function showBanner(wild, ind) {
+  const el    = document.getElementById('banner');
+  const isInd = ind > wild;
+  document.getElementById('b-icon').textContent  = isInd ? '🏭' : '🔥';
+  const t = document.getElementById('b-title');
+  t.textContent  = isInd
+    ? `${ind} industrial source${ind !== 1 ? 's' : ''} identified`
+    : `${wild} wildfire event${wild !== 1 ? 's' : ''} detected`;
+  t.className    = 'banner-title ' + (isInd ? 'ind-t' : 'fire-t');
+  document.getElementById('b-sub').textContent = `${wild} wildfires · ${ind} industrial`;
+
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 4400);
+}
+
+/* ── COUNT-UP ANIMATION ───────────────────────────────── */
+function countUp(id, target) {
+  const el   = document.getElementById(id);
+  let   n    = 0;
+  const step = Math.max(1, Math.ceil(target / 24));
+  const t    = setInterval(() => {
+    n = Math.min(n + step, target);
+    el.textContent = n.toLocaleString();
+    if (n >= target) clearInterval(t);
+  }, 28);
+}
+
+/* ── LOADING ──────────────────────────────────────────── */
+function showLoad(msg) {
+  document.getElementById('loading-txt').textContent = msg || 'Executing classification models';
+  document.getElementById('loading').classList.add('on');
+}
+
+function hideLoad() {
+  document.getElementById('loading').classList.remove('on');
+}
+
+/* ── TOAST ────────────────────────────────────────────── */
+function notify(msg, dur = 3200) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
@@ -1107,250 +1688,25 @@ function toast(msg, dur = 3000) {
   el._t = setTimeout(() => el.classList.remove('show'), dur);
 }
 
-function getCsrf() {
+/* ── CSRF ─────────────────────────────────────────────── */
+function csrf() {
   const m = document.cookie.match(/csrftoken=([^;]+)/);
   return m ? m[1] : '';
 }
 
-/* ── FIRE & THERMAL PARTICLE BURST ANIMATION ────────────────────────────── */
-function runThermalAnimation(isIndustrial) {
-  const overlay = document.getElementById('thermal-overlay');
-  const canvas  = document.getElementById('thermal-canvas');
-  const ctx     = canvas.getContext('2d');
-
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  overlay.classList.add('active');
-
-  const COLOR_WILD = ['#ff6f59', '#ffa726', '#ffb088', '#f48fb1'];
-  const COLOR_IND  = ['#b39ddb', '#ce93d8', '#f48fb1', '#7e57c2'];
-  const COLORS = isIndustrial ? COLOR_IND : COLOR_WILD;
-
-  const particles = [];
-  const count = 100;
-  for (let i = 0; i < count; i++) {
-    particles.push({
-      x: canvas.width * (0.3 + Math.random() * 0.4),
-      y: canvas.height * (0.3 + Math.random() * 0.4),
-      vx: (Math.random() - 0.5) * 8,
-      vy: -Math.random() * 9 - 2,
-      r: Math.random() * 6 + 2,
-      life: 1,
-      decay: 0.01 + Math.random() * 0.02,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)]
-    });
-  }
-
-  let frame = 0;
-  function step() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    let alive = 0;
-    particles.forEach(p => {
-      if (p.life <= 0) return;
-      alive++;
-      p.x  += p.vx;
-      p.y  += p.vy;
-      p.vy += 0.14;
-      p.vx *= 0.98;
-      p.life -= p.decay;
-
-      ctx.save();
-      ctx.globalAlpha = Math.max(0, p.life) * 0.85;
-      ctx.fillStyle = p.color;
-      ctx.shadowBlur = 14;
-      ctx.shadowColor = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    });
-
-    frame++;
-    if (alive > 0 && frame < 160) {
-      requestAnimationFrame(step);
-    } else {
-      overlay.classList.remove('active');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-  }
-  requestAnimationFrame(step);
-}
-
-/* ── IMMERSIVE INTEL BANNER TRIGGER ──────────────────────────────────────── */
-function showIntelBanner(wildcnt, indcnt) {
-  const banner = document.getElementById('intel-banner');
-  const icon   = document.getElementById('intel-icon');
-  const titleEl= document.getElementById('intel-title');
-  const subEl  = document.getElementById('intel-sub');
-
-  const isInd = indcnt > wildcnt;
-  icon.textContent   = isInd ? '🏭' : '🔥';
-  titleEl.textContent  = isInd ? `${indcnt} Industrial Source${indcnt > 1 ? 's' : ''} Identified` : `${wildcnt} Wildfire Event${wildcnt > 1 ? 's' : ''} Identified`;
-  titleEl.className  = 'intel-title' + (isInd ? ' ind-title' : '');
-  subEl.textContent  = `${wildcnt} wildfires / ${indcnt} industrial entities in active sector`;
-
-  banner.classList.add('show');
-  setTimeout(() => banner.classList.remove('show'), 4500);
-}
-
-/* ── RENDER GEOJSON DATA ─────────────────────────────────────────────────── */
-function renderGeoJSON(gj) {
-  markersLayer.clearLayers();
-  if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
-
-  if (!gj.features || !gj.features.length) {
-    toast('No thermal anomalies recorded in current sector');
-    hideLoading();
-    return;
-  }
-
-  const meta = gj.meta || {};
-  animateCount('stat-total', gj.features.length);
-  animateCount('stat-wild',  meta.wildfires  || 0);
-  animateCount('stat-ind',   meta.industrial || 0);
-
-  const heatPoints = [];
-  const listEl = document.getElementById('detection-list');
-  listEl.innerHTML = '';
-  document.getElementById('det-count').textContent = `${gj.features.length} Telemetry Records Loaded`;
-
-  gj.features.forEach((f, idx) => {
-    const p   = f.properties;
-    const lat = f.geometry.coordinates[1];
-    const lon = f.geometry.coordinates[0];
-    const isInd = p.label === 'industrial';
-    const radius = Math.max(6, Math.min(22, (p.marker_size || 8)));
-
-    const marker = L.circleMarker([lat, lon], {
-      radius:      radius,
-      fillColor:   isInd ? '#b39ddb' : '#ff6f59',
-      color:       isInd ? '#ce93d8' : '#ffa726',
-      weight:      1.5,
-      opacity:     0.9,
-      fillOpacity: 0.8,
-    }).addTo(markersLayer);
-
-    const patchHTML = p.patch_url
-      ? `<img src="${p.patch_url}" class="popup-img" alt="Thermal Patch" loading="lazy">`
-      : '';
-
-    const modelCells = ['pca','cnn','firms','hybrid'].map(k => {
-      const prob = (p[`${k}_prob`] || 0) * 100;
-      return `
-        <div class="popup-model-cell">
-          <div class="popup-model-bar-box">
-            <div class="popup-model-bar" style="height:${Math.max(4, prob * 0.25)}px"></div>
-          </div>
-          <div class="popup-model-label">${k}</div>
-        </div>`;
-    }).join('');
-
-    marker.bindPopup(`
-      <div class="popup-box">
-        <div class="popup-top">
-          <span class="popup-type ${isInd ? 'ind' : 'wild'}">${isInd ? 'Industrial Hotspot' : 'Wildfire Event'}</span>
-          <span class="popup-confidence">${p.confidence.toFixed(0)}% Conf</span>
-        </div>
-        <div class="popup-body">
-          ${patchHTML}
-          <div class="popup-details">
-            <div>Lat <b>${lat.toFixed(4)}</b></div>
-            <div>Lon <b>${lon.toFixed(4)}</b></div>
-            <div>Brightness <b>${(+p.brightness).toFixed(1)}K</b></div>
-            <div>FRP <b>${(+p.frp).toFixed(1)} MW</b></div>
-            <div>Date <b>${String(p.acq_date).slice(0,10)}</b></div>
-          </div>
-        </div>
-        <div class="popup-models-grid">${modelCells}</div>
-      </div>
-    `, { maxWidth: 240, className: '' });
-
-    heatPoints.push([lat, lon, Math.min(1, (+p.frp) / 250)]);
-
-    const card = document.createElement('div');
-    card.className = `feed-card ${isInd ? 'ind-card' : ''}`;
-    const confidencePct = Math.min(100, p.confidence);
-    card.innerHTML = `
-      <div class="feed-card-header">
-        <span class="feed-badge ${isInd ? 'ind' : 'wild'}">${isInd ? 'Industrial' : 'Wildfire'}</span>
-        <span class="feed-index">#${idx + 1}</span>
-      </div>
-      <div class="feed-coords">${lat.toFixed(4)}N ${Math.abs(lon).toFixed(4)}${lon < 0 ? 'W' : 'E'}</div>
-      <div class="feed-stats-row">
-        <span>${(+p.brightness).toFixed(0)}K</span>
-        <span>${(+p.frp).toFixed(0)}MW</span>
-        <span>${String(p.acq_date).slice(0,10)}</span>
-      </div>
-      <div class="feed-bar-track">
-        <div class="feed-bar-fill" style="width:${confidencePct}%; background:${isInd ? 'linear-gradient(90deg,#b39ddb,#ce93d8)' : 'linear-gradient(90deg,#ff6f59,#ffa726)'}"></div>
-      </div>
-    `;
-
-    card.addEventListener('click', () => {
-      map.setView([lat, lon], 9);
-      marker.openPopup();
-      triggerSingleIntel(isInd, p.confidence, (+p.brightness).toFixed(0), (+p.frp).toFixed(0));
-    });
-    listEl.appendChild(card);
-  });
-
-  heatLayer = L.heatLayer(heatPoints, {
-    radius: 30, blur: 24, maxZoom: 10,
-    gradient: { 0: '#140f22', 0.3: '#512da8', 0.5: '#7e57c2', 0.75: '#f48fb1', 1: '#ff6f59' }
-  }).addTo(map);
-
-  const coordinates = gj.features.map(f => [f.geometry.coordinates[1], f.geometry.coordinates[0]]);
-  if (coordinates.length) map.fitBounds(coordinates, { padding: [40, 40] });
-
-  hideLoading();
-  runThermalAnimation(meta.industrial > meta.wildfires);
-  setTimeout(() => showIntelBanner(meta.wildfires || 0, meta.industrial || 0), 400);
-  toast(`Classified ${gj.features.length} thermal records successfully`);
-}
-
-/* ── SINGLE RECORD INTEL TRIGGER ─────────────────────────────────────────── */
-function triggerSingleIntel(isInd, conf, bright, frp) {
-  const banner = document.getElementById('intel-banner');
-  const icon   = document.getElementById('intel-icon');
-  const titleEl= document.getElementById('intel-title');
-  const subEl  = document.getElementById('intel-sub');
-
-  icon.textContent   = isInd ? '🏭' : '🔥';
-  titleEl.textContent  = isInd ? 'Industrial Heat Source Verified' : 'Wildfire Event Verified';
-  titleEl.className  = 'intel-title' + (isInd ? ' ind-title' : '');
-  subEl.textContent  = `${conf.toFixed(0)}% Confidence | ${bright}K | ${frp}MW`;
-
-  banner.classList.add('show');
-  clearTimeout(banner._t);
-  banner._t = setTimeout(() => banner.classList.remove('show'), 3500);
-  runThermalAnimation(isInd);
-}
-
-/* ── COUNTER ANIMATION ───────────────────────────────────────────────────── */
-function animateCount(id, target) {
-  const el = document.getElementById(id);
-  let current = 0;
-  const step = Math.max(1, Math.floor(target / 24));
-  const timer = setInterval(() => {
-    current = Math.min(current + step, target);
-    el.textContent = current;
-    if (current >= target) clearInterval(timer);
-  }, 25);
-}
-
-/* ── MAP BOUNDS SYNC ─────────────────────────────────────────────────────── */
+/* ── MAP BOUNDS → INPUTS ──────────────────────────────── */
 map.on('moveend zoomend', () => {
   const b = map.getBounds();
   document.getElementById('lat-min').value = b.getSouth().toFixed(2);
   document.getElementById('lat-max').value = b.getNorth().toFixed(2);
   document.getElementById('lon-min').value = b.getWest().toFixed(2);
   document.getElementById('lon-max').value = b.getEast().toFixed(2);
+  updateCountryLabels();
 });
 
-/* ── API QUERY EXECUTION ─────────────────────────────────────────────────── */
+/* ── BUILT-IN QUERY ───────────────────────────────────── */
 function queryBuiltIn() {
-  showLoading();
+  showLoad();
   const params = new URLSearchParams({
     lat_min:   document.getElementById('lat-min').value,
     lat_max:   document.getElementById('lat-max').value,
@@ -1358,32 +1714,33 @@ function queryBuiltIn() {
     lon_max:   document.getElementById('lon-max').value,
     date_from: document.getElementById('date-from').value,
     date_to:   document.getElementById('date-to').value,
-    limit:     selectedLimit,
+    limit:     selLimit
   });
+
   fetch(`/api/data/?${params}`)
-    .then(r => r.json())
+    .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json(); })
     .then(renderGeoJSON)
-    .catch(err => { hideLoading(); toast('Telemetry Error: ' + err.message); });
+    .catch(err => { hideLoad(); notify('Error: ' + err.message); });
 }
 
-/* ── CSV UPLOAD EXECUTION ────────────────────────────────────────────────── */
+/* ── CSV UPLOAD ───────────────────────────────────────── */
 function uploadCSV() {
   const file = document.getElementById('csv-file').files[0];
-  if (!file) { toast('Please attach a valid FIRMS CSV file'); return; }
-  showLoading();
+  if (!file) { notify('Please select a FIRMS CSV file first'); return; }
+  showLoad('Processing swath data');
   const fd = new FormData();
   fd.append('file', file);
   fetch('/classify/', {
     method: 'POST',
-    headers: { 'X-CSRFToken': getCsrf() },
+    headers: { 'X-CSRFToken': csrf() },
     body: fd
   })
-    .then(r => r.json())
+    .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json(); })
     .then(renderGeoJSON)
-    .catch(err => { hideLoading(); toast('Ingest Error: ' + err.message); });
+    .catch(err => { hideLoad(); notify('Upload error: ' + err.message); });
 }
 
-/* ── AUTO LOAD INITIAL DATA ──────────────────────────────────────────────── */
+/* ── AUTO-LOAD ────────────────────────────────────────── */
 {% if has_data %}
 window.addEventListener('load', () => queryBuiltIn());
 {% endif %}

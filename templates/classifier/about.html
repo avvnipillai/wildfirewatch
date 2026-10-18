@@ -3,40 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Architecture: Aegis Thermal Intelligence</title>
+  <title>Agni · Thermal Intelligence</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --void:        #06040c;
-  --surface:     #0c0816;
-  --glass:       #140f22;
-  --rim:         #241a3a;
-  --rim-glow:    #4a3075;
-  
-  --peach:       #ffb088;
-  --blush:       #f48fb1;
-  --mauve:       #ce93d8;
-  --lavender:    #b39ddb;
-  --violet:      #7e57c2;
-  --deep-violet: #512da8;
-
-  --fire:        #ff6f59;
-  --ember:       #ffa726;
-  --text-main:   #f3eef8;
-  --text-muted:  #ab9ebc;
-
-  --grad-warm:   linear-gradient(135deg, var(--peach) 0%, var(--blush) 50%, var(--mauve) 100%);
-  --grad-cool:   linear-gradient(135deg, var(--mauve) 0%, var(--lavender) 50%, var(--violet) 100%);
-  --grad-hot:    linear-gradient(135deg, var(--fire) 0%, var(--ember) 100%);
-  --grad-mesh:   radial-gradient(circle at 20% 20%, rgba(206,147,216,0.12) 0%, transparent 40%),
-                 radial-gradient(circle at 80% 80%, rgba(126,87,194,0.1) 0%, transparent 40%);
-
-  --ff-display: 'Syne', sans-serif;
-  --ff-body:    'Plus Jakarta Sans', sans-serif;
-  --ff-mono:    'JetBrains Mono', monospace;
-
+ :root {
+  --bg:        #080c13;
+  --surface:   #0d1826;
+  --card:      #121e2e;
+  --raised:    #172435;
+  --border:    rgba(255,255,255,0.065);
+  --border-hi: rgba(255,255,255,0.11);
+  --fire:      #c97250;
+  --fire-lt:   #e09a76;
+  --fire-dk:   #904e30;
+  --fire-dim:  rgba(201,114,80,0.11);
+  --fire-glow: rgba(201,114,80,0.28);
+  --ind:       #4a86a4;
+  --ind-lt:    #74aec8;
+  --ind-dk:    #2d6080;
+  --ind-dim:   rgba(74,134,164,0.11);
+  --ind-glow:  rgba(74,134,164,0.28);
+  --t1: #d4cfc7;
+  --t2: #7a8998;
+  --t3: #364554;
+  --serif: 'Lora', Georgia, serif;
+  --sans:  'DM Sans', system-ui, sans-serif;
+  --mono:  'JetBrains Mono', monospace;
+  /* Content styles use these aliases so the page shares HOME's palette. */
+  --void: var(--bg);
+  --glass: var(--card);
+  --rim: var(--border);
+  --rim-glow: var(--border-hi);
+  --peach: var(--fire-lt);
+  --blush: var(--fire);
+  --mauve: var(--ind-lt);
+  --lavender: var(--ind-lt);
+  --violet: var(--ind);
+  --deep-violet: var(--ind-dk);
+  --ember: var(--fire-lt);
+  --text-main: var(--t1);
+  --text-muted: var(--t2);
+  --grad-warm: linear-gradient(135deg, var(--fire-dk), var(--fire), var(--fire-lt));
+  --grad-cool: linear-gradient(135deg, var(--ind-dk), var(--ind), var(--ind-lt));
+  --grad-hot: linear-gradient(135deg, var(--fire), var(--fire-lt));
+  --grad-mesh: radial-gradient(circle at 20% 20%, rgba(201,114,80,0.07) 0%, transparent 40%), radial-gradient(circle at 80% 80%, rgba(74,134,164,0.06) 0%, transparent 40%);
+  --ff-display: var(--serif);
+  --ff-body: var(--sans);
+  --ff-mono: var(--mono);
   color-scheme: dark;
 }
 
@@ -46,7 +63,7 @@ body {
   font-family: var(--ff-body);
   background: var(--void);
   color: var(--text-main);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.7;
   position: relative;
   overflow-x: hidden;
@@ -65,15 +82,15 @@ body::before {
 header {
   position: sticky;
   top: 0;
-  height: 64px;
+  height: 54px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  padding: 0 32px;
-  gap: 24px;
-  background: rgba(12,8,22,0.9);
-  border-bottom: 1px solid var(--rim);
-  backdrop-filter: blur(16px);
-  z-index: 100;
+  padding: 0 18px;
+  gap: 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  z-index: 300;
 }
 
 header::after {
@@ -81,14 +98,14 @@ header::after {
   position: absolute;
   bottom: -1px; left: 0; right: 0;
   height: 1px;
-  background: var(--grad-warm);
-  opacity: 0.6;
+  background: var(--fire);
+  opacity: 0.35;
 }
 
 .brand {
-  font-family: var(--ff-display);
-  font-weight: 800;
-  font-size: 1.25rem;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 0.95rem;
   letter-spacing: -0.02em;
   display: flex;
   align-items: center;
@@ -96,12 +113,12 @@ header::after {
 }
 
 .brand-icon {
-  width: 32px; height: 32px;
-  border-radius: 10px;
-  background: var(--grad-warm);
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(145deg, var(--fire-lt) 0%, var(--fire) 55%, var(--fire-dk) 100%);
   display: flex; align-items: center; justify-content: center;
   font-size: 16px;
-  box-shadow: 0 0 20px rgba(244,143,177,0.3);
+  box-shadow: 0 2px 12px var(--fire-glow);
 }
 
 .brand-name {
@@ -112,20 +129,20 @@ header::after {
 }
 
 .nav-pill {
-  font-family: var(--ff-display);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--t2);
   text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 10px;
+  padding: 5px 12px;
+  border-radius: 7px;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.nav-pill:hover { color: var(--text-main); background: var(--glass); }
+.nav-pill:hover { color: var(--t1); background: var(--card); }
 .nav-pill.active {
-  color: var(--peach);
-  background: rgba(255,176,136,0.1);
-  border: 1px solid rgba(255,176,136,0.2);
+  color: var(--fire-lt);
+  background: var(--fire-dim);
+  border: 1px solid rgba(201,114,80,0.2);
 }
 .header-spacer { flex: 1; }
 
@@ -446,40 +463,69 @@ p { color: var(--text-muted); margin-bottom: 16px; line-height: 1.75; }
   background: linear-gradient(90deg, transparent, var(--rim) 30%, var(--rim) 70%, transparent);
   margin: 48px 0;
 }
+
+/* Header elements shared with HOME.html */
+.brand { text-decoration: none; color: inherit; flex-shrink: 0; }
+.brand-text { display: flex; flex-direction: column; gap: 1px; }
+.brand-name { line-height: 1; color: var(--t1); background: none; -webkit-text-fill-color: currentColor; }
+.brand-sub { font-family: var(--mono); font-size: 0.48rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); line-height: 1; }
+.live-pill { display: flex; align-items: center; gap: 5px; background: var(--card); border: 1px solid var(--border); border-radius: 100px; padding: 3px 10px; font-family: var(--mono); font-size: 0.52rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--t2); flex-shrink: 0; }
+.live-dot { width: 5px; height: 5px; border-radius: 50%; background: #4aae80; box-shadow: 0 0 7px rgba(74,174,128,0.65); animation: dot-blink 3s ease-in-out infinite; }
+@keyframes dot-blink { 0%,100% { opacity: 1; } 55% { opacity: 0.3; } }
+.header-spacer { flex: 1; }
+@media (max-width: 640px) {
+  header { padding: 0 12px; gap: 8px; }
+  .live-pill { display: none; }
+  .nav-pill { padding: 5px 8px; font-size: 0.72rem; }
+  .page { padding: 38px 18px 64px; }
+  .results-grid { grid-template-columns: 1fr; }
+  .data-table th, .data-table td, .feat-table th, .feat-table td { padding: 10px 9px; }
+}
+
 </style>
 </head>
 <body>
 
 <header>
-  <div class="brand">
+  <a href="/" class="brand">
     <div class="brand-icon">🛰</div>
-    <span class="brand-name">Aegis Thermal</span>
+    <div class="brand-text">
+      <span class="brand-name">Agni</span>
+      <span class="brand-sub">VIIRS Neural Intelligence</span>
+    </div>
+  </a>
+
+  <div class="live-pill">
+    <div class="live-dot"></div>
+    VIIRS Feed
   </div>
+
   <div class="header-spacer"></div>
+
   <a href="/" class="nav-pill">Command Map</a>
   <a href="/about/" class="nav-pill active">Architecture</a>
 </header>
 
 <main class="page">
 
-  <div class="hero-tag">Technical Overview[cite: 2]</div>
+  <div class="hero-tag">Technical Overview</div>
   <h1>From satellite scan to fire classification</h1>
-  <p class="hero-desc">Four machine learning models fused into one system that reads thermal radiation from orbit and decides, in under a second, whether what is burning below is a wildfire or an industrial heat source[cite: 2].</p>
+  <p class="hero-desc">Four machine learning models fused into one system that reads thermal radiation from orbit and decides, in under a second, whether what is burning below is a wildfire or an industrial heat source.</p>
 
   <hr class="divider">
 
   <h2>The satellite data</h2>
-  <p>Every 12 hours, the VIIRS sensor aboard Suomi-NPP and NOAA-20 sweeps every point on Earth at 375 metre resolution[cite: 2]. Two thermal bands capture the scene[cite: 2]:</p>
+  <p>Every 12 hours, the VIIRS sensor aboard Suomi-NPP and NOAA-20 sweeps every point on Earth at 375 metre resolution. Two thermal bands capture the scene:</p>
 
   <table class="data-table">
     <thead><tr><th>Band</th><th>Wavelength</th><th>What it sees</th></tr></thead>
     <tbody>
-      <tr><td>I-4 (M13)</td><td>3.55 to 3.93 microns[cite: 2]</td><td>Peak emission from actively burning material at 600 to 1200 K[cite: 2]</td></tr>
-      <tr><td>I-5</td><td>10.5 to 12.4 microns[cite: 2]</td><td>Ambient land surface temperature, the thermal background[cite: 2]</td></tr>
+      <tr><td>I-4 (M13)</td><td>3.55 to 3.93 microns</td><td>Peak emission from actively burning material at 600 to 1200 K</td></tr>
+      <tr><td>I-5</td><td>10.5 to 12.4 microns</td><td>Ambient land surface temperature, the thermal background</td></tr>
     </tbody>
   </table>
 
-  <p>When a pixel is significantly hotter than its neighbours, the FIRMS algorithm flags it as a thermal anomaly and records brightness temperature, Fire Radiative Power (FRP) in megawatts, scan geometry, and acquisition time[cite: 2]. This project uses 200,000 such records covering South Asia from 2012 to 2023, with 97.8% matched to real satellite swath files[cite: 2].</p>
+  <p>When a pixel is significantly hotter than its neighbours, the FIRMS algorithm flags it as a thermal anomaly and records brightness temperature, Fire Radiative Power (FRP) in megawatts, scan geometry, and acquisition time. This project uses 200,000 such records covering South Asia from 2012 to 2023, with 97.8% matched to real satellite swath files.</p>
 
   <h2>The full pipeline</h2>
 
@@ -487,100 +533,100 @@ p { color: var(--text-muted); margin-bottom: 16px; line-height: 1.75; }
     <div class="pipe-step hot">
       <div class="pipe-num">01</div>
       <div class="pipe-body">
-        <div class="pipe-label">Sensor[cite: 2]</div>
-        <div class="pipe-title">VIIRS I-band radiance capture[cite: 2]</div>
-        <div class="pipe-desc">Raw at-sensor radiance from VNP02IMG, geolocated by VNP03IMG at 375 m per pixel[cite: 2]</div>
+        <div class="pipe-label">Sensor</div>
+        <div class="pipe-title">VIIRS I-band radiance capture</div>
+        <div class="pipe-desc">Raw at-sensor radiance from VNP02IMG, geolocated by VNP03IMG at 375 m per pixel</div>
       </div>
     </div>
     <div class="pipe-step hot">
       <div class="pipe-num">02</div>
       <div class="pipe-body">
-        <div class="pipe-label">Detection[cite: 2]</div>
-        <div class="pipe-title">FIRMS contextual fire algorithm[cite: 2]</div>
-        <div class="pipe-desc">Compares each pixel's I-4 brightness to a background window, flags anomalies, computes FRP from Stefan-Boltzmann law[cite: 2]</div>
+        <div class="pipe-label">Detection</div>
+        <div class="pipe-title">FIRMS contextual fire algorithm</div>
+        <div class="pipe-desc">Compares each pixel's I-4 brightness to a background window, flags anomalies, computes FRP from Stefan-Boltzmann law</div>
       </div>
     </div>
     <div class="pipe-step cool">
       <div class="pipe-num">03</div>
       <div class="pipe-body">
-        <div class="pipe-label">Labelling[cite: 2]</div>
-        <div class="pipe-title">Proximity to Global Power Plant Database[cite: 2]</div>
-        <div class="pipe-desc">Haversine distance to 35,000 real plants[cite: 2]. Within 5 km means Industrial[cite: 2]. Otherwise Wildfire[cite: 2]. Zero manual annotation needed[cite: 2].</div>
+        <div class="pipe-label">Labelling</div>
+        <div class="pipe-title">Proximity to Global Power Plant Database</div>
+        <div class="pipe-desc">Haversine distance to 35,000 real plants. Within 5 km means Industrial. Otherwise Wildfire. Zero manual annotation needed.</div>
       </div>
     </div>
     <div class="pipe-step cool">
       <div class="pipe-num">04</div>
       <div class="pipe-body">
-        <div class="pipe-label">Patches[cite: 2]</div>
-        <div class="pipe-title">64 by 64 pixel thermal image extraction[cite: 2]</div>
-        <div class="pipe-desc">Each detection becomes a 64x64 crop from the VNP02IMG swath, centred on its pixel, normalised to 0 to 1 range[cite: 2]</div>
+        <div class="pipe-label">Patches</div>
+        <div class="pipe-title">64 by 64 pixel thermal image extraction</div>
+        <div class="pipe-desc">Each detection becomes a 64x64 crop from the VNP02IMG swath, centred on its pixel, normalised to 0 to 1 range</div>
       </div>
     </div>
     <div class="pipe-step cool">
       <div class="pipe-num">05</div>
       <div class="pipe-body">
-        <div class="pipe-label">Experiment 1[cite: 2]</div>
-        <div class="pipe-title">PCA: spatial compression and reconstruction error[cite: 2]</div>
-        <div class="pipe-desc">Flatten 64x64 to 4096 dimensions, compress to 50 principal components[cite: 2]. Reconstruction error measures how anomalous the shape is[cite: 2]. Wildfire patches are irregular and compress poorly[cite: 2]; industrial hotspots are compact and compress cleanly[cite: 2].</div>
+        <div class="pipe-label">Experiment 1</div>
+        <div class="pipe-title">PCA: spatial compression and reconstruction error</div>
+        <div class="pipe-desc">Flatten 64x64 to 4096 dimensions, compress to 50 principal components. Reconstruction error measures how anomalous the shape is. Wildfire patches are irregular and compress poorly; industrial hotspots are compact and compress cleanly.</div>
       </div>
     </div>
     <div class="pipe-step cool">
       <div class="pipe-num">06</div>
       <div class="pipe-body">
-        <div class="pipe-label">Experiment 2[cite: 2]</div>
-        <div class="pipe-title">CNN: learned spatial pattern recognition[cite: 2]</div>
-        <div class="pipe-desc">Three convolutional blocks extract blob size, edge sharpness, symmetry, and spread into a 128-dimensional feature vector[cite: 2]. Trained end-to-end on the 64x64 patches[cite: 2].</div>
+        <div class="pipe-label">Experiment 2</div>
+        <div class="pipe-title">CNN: learned spatial pattern recognition</div>
+        <div class="pipe-desc">Three convolutional blocks extract blob size, edge sharpness, symmetry, and spread into a 128-dimensional feature vector. Trained end-to-end on the 64x64 patches.</div>
       </div>
     </div>
     <div class="pipe-step cool">
       <div class="pipe-num">07</div>
       <div class="pipe-body">
-        <div class="pipe-label">Experiment 3[cite: 2]</div>
-        <div class="pipe-title">FIRMS tabular: spectral and temporal features[cite: 2]</div>
-        <div class="pipe-desc">Random Forest on brightness, FRP, I4 minus I5 contrast, FRP per pixel area, day/night flag, cyclic hour and month encoding[cite: 2]. Industrial sources appear in both day and night passes; wildfires are mostly daytime[cite: 2].</div>
+        <div class="pipe-label">Experiment 3</div>
+        <div class="pipe-title">FIRMS tabular: spectral and temporal features</div>
+        <div class="pipe-desc">Random Forest on brightness, FRP, I4 minus I5 contrast, FRP per pixel area, day/night flag, cyclic hour and month encoding. Industrial sources appear in both day and night passes; wildfires are mostly daytime.</div>
       </div>
     </div>
     <div class="pipe-step cool">
       <div class="pipe-num">08</div>
       <div class="pipe-body">
-        <div class="pipe-label">Experiment 4[cite: 2]</div>
-        <div class="pipe-title">Hybrid fusion: 193-dimensional late fusion[cite: 2]</div>
-        <div class="pipe-desc">Concatenate PCA features (51-d), CNN features (128-d), and FIRMS tabular features (14-d) into a single vector[cite: 2]. LogisticRegression trained on the combined representation achieves the highest AUC of all four experiments[cite: 2].</div>
+        <div class="pipe-label">Experiment 4</div>
+        <div class="pipe-title">Hybrid fusion: 193-dimensional late fusion</div>
+        <div class="pipe-desc">Concatenate PCA features (51-d), CNN features (128-d), and FIRMS tabular features (14-d) into a single vector. LogisticRegression trained on the combined representation achieves the highest AUC of all four experiments.</div>
       </div>
     </div>
   </div>
 
   <h2>Model performance</h2>
-  <p>Results on 36,785 South Asia detections spanning 11 years of VIIRS archive data, with 89% wildfire and 11% industrial class balance[cite: 2].</p>
+  <p>Results on 36,785 South Asia detections spanning 11 years of VIIRS archive data, with 89% wildfire and 11% industrial class balance.</p>
 
   <div class="results-grid">
     <div class="result-card best">
-      <div class="rc-tag">Best Model[cite: 2]</div>
-      <div class="rc-model">Hybrid Fusion[cite: 2]</div>
-      <div class="rc-auc">0.8665[cite: 2]</div>
+      <div class="rc-tag">Best Model</div>
+      <div class="rc-model">Hybrid Fusion</div>
+      <div class="rc-auc">0.8665</div>
       <div class="rc-bar"><div class="rc-bar-fill" style="width:86.65%"></div></div>
-      <div class="rc-sub">ROC-AUC | Avg Precision 0.67 | Industrial F1 0.46[cite: 2]</div>
+      <div class="rc-sub">ROC-AUC | Avg Precision 0.67 | Industrial F1 0.46</div>
     </div>
     <div class="result-card">
-      <div class="rc-tag">Experiment 2[cite: 2]</div>
-      <div class="rc-model">CNN[cite: 2]</div>
-      <div class="rc-auc">0.8123[cite: 2]</div>
+      <div class="rc-tag">Experiment 2</div>
+      <div class="rc-model">CNN</div>
+      <div class="rc-auc">0.8123</div>
       <div class="rc-bar"><div class="rc-bar-fill" style="width:81.23%"></div></div>
-      <div class="rc-sub">ROC-AUC | Avg Precision 0.55[cite: 2]</div>
+      <div class="rc-sub">ROC-AUC | Avg Precision 0.55</div>
     </div>
     <div class="result-card">
-      <div class="rc-tag">Experiment 3[cite: 2]</div>
-      <div class="rc-model">FIRMS Tabular[cite: 2]</div>
-      <div class="rc-auc">0.7981[cite: 2]</div>
+      <div class="rc-tag">Experiment 3</div>
+      <div class="rc-model">FIRMS Tabular</div>
+      <div class="rc-auc">0.7981</div>
       <div class="rc-bar"><div class="rc-bar-fill" style="width:79.81%"></div></div>
-      <div class="rc-sub">ROC-AUC | Avg Precision 0.34[cite: 2]</div>
+      <div class="rc-sub">ROC-AUC | Avg Precision 0.34</div>
     </div>
     <div class="result-card">
-      <div class="rc-tag">Experiment 1[cite: 2]</div>
-      <div class="rc-model">PCA Only[cite: 2]</div>
-      <div class="rc-auc">0.6922[cite: 2]</div>
+      <div class="rc-tag">Experiment 1</div>
+      <div class="rc-model">PCA Only</div>
+      <div class="rc-auc">0.6922</div>
       <div class="rc-bar"><div class="rc-bar-fill" style="width:69.22%"></div></div>
-      <div class="rc-sub">ROC-AUC | Avg Precision 0.20[cite: 2]</div>
+      <div class="rc-sub">ROC-AUC | Avg Precision 0.20</div>
     </div>
   </div>
 
@@ -591,13 +637,13 @@ p { color: var(--text-muted); margin-bottom: 16px; line-height: 1.75; }
       <tr><th>Feature</th><th>Wildfire</th><th>Industrial</th></tr>
     </thead>
     <tbody>
-      <tr><td>FRP (megawatts)[cite: 2]</td><td class="wild-val">Variable, spiky bursts[cite: 2]</td><td class="ind-val">Extremely high and stable[cite: 2]</td></tr>
-      <tr><td>Brightness I-4 (Kelvin)[cite: 2]</td><td class="wild-val">Moderate to high[cite: 2]</td><td class="ind-val">Very high, consistent between passes[cite: 2]</td></tr>
-      <tr><td>bright_diff (I4 minus I5)[cite: 2]</td><td class="wild-val">High contrast[cite: 2]</td><td class="ind-val">Extreme contrast, narrow spread[cite: 2]</td></tr>
-      <tr><td>Day vs night presence[cite: 2]</td><td class="wild-val">Mostly daytime[cite: 2]</td><td class="ind-val">Equal day and night, burns 24/7[cite: 2]</td></tr>
-      <tr><td>FRP per pixel area[cite: 2]</td><td class="wild-val">Spread across large area[cite: 2]</td><td class="ind-val">Concentrated in one to two pixels[cite: 2]</td></tr>
-      <tr><td>Spatial shape (CNN)[cite: 2]</td><td class="wild-val">Wide, irregular, spreading[cite: 2]</td><td class="ind-val">Tight, symmetric circular hotspot[cite: 2]</td></tr>
-      <tr><td>Reconstruction error (PCA)[cite: 2]</td><td class="wild-val">High, unusual shape[cite: 2]</td><td class="ind-val">Low, same compact shape every time[cite: 2]</td></tr>
+      <tr><td>FRP (megawatts)</td><td class="wild-val">Variable, spiky bursts</td><td class="ind-val">Extremely high and stable</td></tr>
+      <tr><td>Brightness I-4 (Kelvin)</td><td class="wild-val">Moderate to high</td><td class="ind-val">Very high, consistent between passes</td></tr>
+      <tr><td>bright_diff (I4 minus I5)</td><td class="wild-val">High contrast</td><td class="ind-val">Extreme contrast, narrow spread</td></tr>
+      <tr><td>Day vs night presence</td><td class="wild-val">Mostly daytime</td><td class="ind-val">Equal day and night, burns 24/7</td></tr>
+      <tr><td>FRP per pixel area</td><td class="wild-val">Spread across large area</td><td class="ind-val">Concentrated in one to two pixels</td></tr>
+      <tr><td>Spatial shape (CNN)</td><td class="wild-val">Wide, irregular, spreading</td><td class="ind-val">Tight, symmetric circular hotspot</td></tr>
+      <tr><td>Reconstruction error (PCA)</td><td class="wild-val">High, unusual shape</td><td class="ind-val">Low, same compact shape every time</td></tr>
     </tbody>
   </table>
 
@@ -606,9 +652,9 @@ p { color: var(--text-muted); margin-bottom: 16px; line-height: 1.75; }
   <table class="data-table">
     <thead><tr><th>Dataset</th><th>Details</th></tr></thead>
     <tbody>
-      <tr><td>NASA FIRMS VIIRS SV-C2[cite: 2]</td><td>200,000 thermal anomaly detections. South Asia 2012 to 2023. Updated within 3 hours of overpass[cite: 2].</td></tr>
-      <tr><td>WRI Global Power Plant DB[cite: 2]</td><td>35,000+ power plants worldwide used as automatic industrial ground truth labels[cite: 2].</td></tr>
-      <tr><td>VNP02IMG + VNP03IMG[cite: 2]</td><td>VIIRS radiance and geolocation swath files. 375 m resolution. 97.8% of detections matched to real satellite imagery[cite: 2].</td></tr>
+      <tr><td>NASA FIRMS VIIRS SV-C2</td><td>200,000 thermal anomaly detections. South Asia 2012 to 2023. Updated within 3 hours of overpass.</td></tr>
+      <tr><td>WRI Global Power Plant DB</td><td>35,000+ power plants worldwide used as automatic industrial ground truth labels.</td></tr>
+      <tr><td>VNP02IMG + VNP03IMG</td><td>VIIRS radiance and geolocation swath files. 375 m resolution. 97.8% of detections matched to real satellite imagery.</td></tr>
     </tbody>
   </table>
 
