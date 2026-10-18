@@ -12,6 +12,7 @@ import json
 import io
 import os
 import logging
+from functools import lru_cache
 from urllib.parse import urlencode
 import numpy as np
 import pandas as pd
@@ -28,7 +29,17 @@ logger = logging.getLogger(__name__)
 FIRMS_DATA_PATH = os.path.join(
     os.path.dirname(__file__), '..', 'data', 'firms_labelled.csv'
 )
+WORLD_OUTLINE_PATH = os.path.join(
+    os.path.dirname(__file__), 'map_data', 'world_outline.geojson'
+)
 _FIRMS_CACHE = None
+
+
+@lru_cache(maxsize=1)
+def _load_world_outline():
+    with open(WORLD_OUTLINE_PATH, encoding='utf-8') as outline_file:
+        return json.load(outline_file)
+
 
 def _load_firms():
     global _FIRMS_CACHE
@@ -55,6 +66,12 @@ def home(request):
 
 def about(request):
     return render(request, 'classifier/about.html')
+
+
+@require_http_methods(['GET'])
+def api_world_outline(request):
+    """Return the local Natural Earth country outlines used by the map."""
+    return JsonResponse(_load_world_outline())
 
 
 @csrf_exempt
