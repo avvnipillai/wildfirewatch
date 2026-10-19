@@ -160,7 +160,7 @@ def classify_detections(df: pd.DataFrame) -> pd.DataFrame:
     pseudo = (cnn_prob > 0.5).astype(int)
     if pseudo.sum() == 0: pseudo[np.argmax(cnn_prob)] = 1
     if pseudo.sum() == n:  pseudo[np.argmin(cnn_prob)] = 0
-    rf = RandomForestClassifier(100, random_state=42, class_weight='balanced')
+    rf = RandomForestClassifier(20, random_state=42, class_weight='balanced')
     rf.fit(X_tab_s, pseudo)
     firms_prob = rf.predict_proba(X_tab_s)[:,1]
     importances = dict(zip(feat_names, rf.feature_importances_))

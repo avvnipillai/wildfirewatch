@@ -90,21 +90,13 @@ def api_world_outline(request):
     """Return the local Natural Earth country outlines used by the map."""
     return JsonResponse(_load_world_outline())
 
-
+import hashlib, json as _json
+_CLASSIFY_CACHE: dict = {}
 @require_http_methods(["GET"])
 def api_filter(request):
-    """
-    GET /api/data/?lat_min=&lat_max=&lon_min=&lon_max=
-
-    Returns classified GeoJSON for the fixed dataset period.
-    """
     df = _load_firms()
-
     if df is None:
-        return JsonResponse(
-            {"error": "No built-in dataset found."},
-            status=404,
-        )
+        return JsonResponse({"error": "No built-in dataset found."}, status=404)
 
     try:
         lat_min = float(request.GET.get("lat_min", 25))
@@ -112,31 +104,29 @@ def api_filter(request):
         lon_min = float(request.GET.get("lon_min", -130))
         lon_max = float(request.GET.get("lon_max", -65))
 
+        # Round to 1 decimal so nearby identical views hit the cache
+        cache_key = f"{round(lat_min,1)},{round(lat_max,1)},{round(lon_min,1)},{round(lon_max,1)}"
+
+        if cache_key in _CLASSIFY_CACHE:
+            return JsonResponse(_CLASSIFY_CACHE[cache_key], safe=False)
+
         mask = (
             df["latitude"].between(lat_min, lat_max)
             & df["longitude"].between(lon_min, lon_max)
-            & df["acq_date"].between(
-                DATASET_START_DATE,
-                DATASET_END_DATE,
-            )
+            & df["acq_date"].between(DATASET_START_DATE, DATASET_END_DATE)
         )
-
         subset = df[mask].head(300)
 
         if len(subset) == 0:
             return JsonResponse({
-                "type": "FeatureCollection",
-                "features": [],
-                "meta": {
-                    "count": 0,
-                    "message": (
-                        "No detections in selected region/date range."
-                    ),
-                },
+                "type": "FeatureCollection", "features": [],
+                "meta": {"count": 0, "message": "No detections in selected region/date range."},
             })
 
         results = classify_detections(subset)
-        return JsonResponse(_to_geojson(results), safe=False)
+        geojson = _to_geojson(results)
+        _CLASSIFY_CACHE[cache_key] = geojson   # ← cache it
+        return JsonResponse(geojson, safe=False)
 
     except Exception as e:
         logger.exception("api_filter error")

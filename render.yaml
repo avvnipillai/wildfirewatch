@@ -1,6 +1,3 @@
-# render.yaml — Deploy to Render.com with one click
-# Push this to GitHub, then connect the repo on render.com
-
 services:
   - type: web
     name: wildfirewatch
@@ -8,12 +5,12 @@ services:
     dockerfilePath: ./Dockerfile
     envVars:
       - key: DJANGO_SECRET_KEY
-        generateValue: true          # Render generates a secure key automatically
+        generateValue: true
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
         value: "wildfirewatch.onrender.com"
-    disk:
-      name: app-data
-      mountPath: /app/data
-      sizeGB: 2
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
