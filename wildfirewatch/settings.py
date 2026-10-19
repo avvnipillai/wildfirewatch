@@ -25,6 +25,15 @@ ALLOWED_HOSTS = os.environ.get(
     "localhost 127.0.0.1 testserver wildfirewatch-2.onrender.com, wildfirewatch-2.up.railway.app",
 ).split()
 
+CSRF_TRUSTED_ORIGINS = [
+    origin
+    for origin in os.environ.get(
+        "CSRF_TRUSTED_ORIGINS",
+        "https://wildfirewatch-production.up.railway.app",
+    ).split()
+    if origin
+]
+
 
 # Applications
 INSTALLED_APPS = [
