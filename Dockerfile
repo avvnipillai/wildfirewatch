@@ -33,6 +33,7 @@ RUN mkdir -p data models results staticfiles media
 # Collect static files
 ENV DJANGO_SETTINGS_MODULE=wildfirewatch.settings
 ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SECRET_KEY=place_with_a_generated_django_secret_key
 RUN python manage.py collectstatic --noinput
 
 # Expose port

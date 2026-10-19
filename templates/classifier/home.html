@@ -348,48 +348,6 @@ aside {
   margin-bottom: 5px;
 }
 
-/* ── DATE RANGE INPUT ──────────────────────────────────── */
-.date-range {
-  display: flex;
-  align-items: flex-end;
-  gap: 6px;
-}
-
-.date-range .d-field { flex: 1; }
-
-.date-sep {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--t3);
-  padding-bottom: 8px;
-  flex-shrink: 0;
-}
-
-.inp {
-  width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  padding: 7px 9px;
-  color: var(--t1);
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  outline: none;
-  color-scheme: dark;
-  transition: border-color 0.14s, box-shadow 0.14s;
-  appearance: none;
-}
-
-.inp:focus {
-  border-color: rgba(201,114,80,0.5);
-  box-shadow: 0 0 0 2.5px rgba(201,114,80,0.12);
-}
-
-.inp[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.5) opacity(0.5);
-  cursor: pointer;
-}
-
 /* ── COMPASS BBOX SELECTOR ─────────────────────────────── */
 .compass {
   display: flex;
@@ -538,63 +496,6 @@ aside {
 .btn-run-inner {
   display: flex; align-items: center; justify-content: center; gap: 7px;
 }
-
-/* ── DROPZONE ──────────────────────────────────────────── */
-.dz {
-  border: 1.5px dashed var(--border-hi);
-  border-radius: 8px;
-  padding: 13px;
-  text-align: center;
-  cursor: pointer;
-  position: relative;
-  background: var(--surface);
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.dz:hover, .dz.over {
-  border-color: rgba(74,134,164,0.45);
-  background: var(--ind-dim);
-}
-
-.dz input {
-  position: absolute; inset: 0;
-  opacity: 0; cursor: pointer;
-  width: 100%; height: 100%;
-}
-
-.dz-icon { font-size: 1.1rem; display: block; opacity: 0.45; margin-bottom: 4px; }
-
-.dz-txt {
-  font-family: var(--mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--t2);
-}
-
-.dz-file {
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  color: var(--ind-lt);
-  margin-top: 3px;
-  display: none;
-}
-
-.btn-sec {
-  width: 100%;
-  padding: 8px;
-  background: transparent;
-  border: 1px solid rgba(74,134,164,0.3);
-  border-radius: 7px;
-  color: var(--ind-lt);
-  font-family: var(--sans);
-  font-size: 0.76rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.14s, border-color 0.14s;
-}
-
-.btn-sec:hover { background: var(--ind-dim); border-color: var(--ind); }
 
 /* ── LEGEND ────────────────────────────────────────────── */
 .legend { display: flex; flex-direction: column; gap: 5px; }
@@ -1116,7 +1017,7 @@ aside {
   <div class="h-sep"></div>
 
   <a href="/" class="nav-link active">Command Map</a>
-  <a href="/about/" class="nav-link">Architecture</a>
+
 </header>
 
 <!-- Workspace -->
@@ -1148,7 +1049,7 @@ aside {
           <div class="panel-title">
             <span class="ptitle-icon">⌖</span> Map Filters
           </div>
-          <span class="panel-tag">Dates · Area · Type</span>
+          <span class="panel-tag">Area · Type</span>
         </div>
         <div class="panel-body">
           <div>
@@ -1159,7 +1060,7 @@ aside {
               <button type="button" class="chip class-filter-chip" data-class="industrial" aria-pressed="false">Industrial</button>
             </div>
           </div>
-          <div class="class-filter-note">Set the date range and geographic bounds below, then execute the query.</div>
+          <div class="class-filter-note">Choose a detection type and area to explore.</div>
         </div>
       </div>
 
@@ -1180,26 +1081,17 @@ aside {
         </div>
       </div>
 
-      <!-- Temporal span -->
+      <!-- Fixed dataset period -->
       <div class="panel">
         <div class="panel-head">
           <div class="panel-title">
             <span class="ptitle-icon">⏱</span> Temporal Span
           </div>
-          <span class="panel-tag">Date Filter</span>
+          <span class="panel-tag">Fixed Period</span>
         </div>
         <div class="panel-body">
           <div>
-            <div class="f-lbl">Date window</div>
-            <div class="date-range">
-              <div class="d-field">
-                <input type="date" id="date-from" class="inp" value="{{ date_min }}" aria-label="Start date">
-              </div>
-              <span class="date-sep">–</span>
-              <div class="d-field">
-                <input type="date" id="date-to" class="inp" value="{{ date_max }}" aria-label="End date">
-              </div>
-            </div>
+            <div class="f-lbl">10 October 2012 – 5 March 2013</div>
           </div>
         </div>
       </div>
@@ -1238,41 +1130,12 @@ aside {
             </div>
           </div>
 
-          <div>
-            <div class="f-lbl">Detection limit</div>
-            <div class="chips" id="limit-chips">
-              <div class="chip" data-val="100">100</div>
-              <div class="chip active" data-val="200">200</div>
-              <div class="chip" data-val="300">300</div>
-              <div class="chip" data-val="500">500</div>
-            </div>
-          </div>
-
           <button class="btn-run" id="run-btn" onclick="queryBuiltIn()">
             <div class="btn-run-inner">
               <span>⚡</span> Execute Classification
             </div>
           </button>
 
-        </div>
-      </div>
-
-      <!-- CSV Upload -->
-      <div class="panel">
-        <div class="panel-head">
-          <div class="panel-title">
-            <span class="ptitle-icon">📂</span> Ingest Swath Data
-          </div>
-          <span class="panel-tag">CSV Upload</span>
-        </div>
-        <div class="panel-body">
-          <div class="dz" id="dropzone">
-            <input type="file" id="csv-file" accept=".csv" aria-label="Upload FIRMS CSV">
-            <span class="dz-icon">📡</span>
-            <div class="dz-txt">Drop FIRMS CSV here or click to browse</div>
-            <div class="dz-file" id="dz-file"></div>
-          </div>
-          <button class="btn-sec" onclick="uploadCSV()">Process Swath Data</button>
         </div>
       </div>
 
@@ -1384,7 +1247,6 @@ fetch('/api/world-outline/')
 
 const markerLayer = L.layerGroup().addTo(map);
 let heatLayer = null;
-let selLimit  = 200;
 let selectedClass = 'all';
 let renderedDetections = [];
 
@@ -1417,29 +1279,6 @@ document.querySelectorAll('#class-filter .chip').forEach(button => {
       `${visibleCount.toLocaleString()} ${shown} detections shown`;
   });
 });
-
-/* ── CHIP SELECTION ───────────────────────────────────── */
-document.querySelectorAll('#limit-chips .chip').forEach(c => {
-  c.addEventListener('click', () => {
-    document.querySelectorAll('#limit-chips .chip').forEach(x => x.classList.remove('active'));
-    c.classList.add('active');
-    selLimit = parseInt(c.dataset.val, 10);
-  });
-});
-
-/* ── FILE INPUT ───────────────────────────────────────── */
-const csvInput   = document.getElementById('csv-file');
-const dzFile     = document.getElementById('dz-file');
-const dzEl       = document.getElementById('dropzone');
-
-csvInput.addEventListener('change', e => {
-  const f = e.target.files[0];
-  if (f) { dzFile.textContent = f.name; dzFile.style.display = 'block'; }
-});
-
-dzEl.addEventListener('dragover', e => { e.preventDefault(); dzEl.classList.add('over'); });
-dzEl.addEventListener('dragleave', ()  => dzEl.classList.remove('over'));
-dzEl.addEventListener('drop', ()       => dzEl.classList.remove('over'));
 
 /* ── HOVER TOOLTIP ────────────────────────────────────── */
 const mtt      = document.getElementById('mtt');
@@ -1688,12 +1527,6 @@ function notify(msg, dur = 3200) {
   el._t = setTimeout(() => el.classList.remove('show'), dur);
 }
 
-/* ── CSRF ─────────────────────────────────────────────── */
-function csrf() {
-  const m = document.cookie.match(/csrftoken=([^;]+)/);
-  return m ? m[1] : '';
-}
-
 /* ── MAP BOUNDS → INPUTS ──────────────────────────────── */
 map.on('moveend zoomend', () => {
   const b = map.getBounds();
@@ -1712,32 +1545,12 @@ function queryBuiltIn() {
     lat_max:   document.getElementById('lat-max').value,
     lon_min:   document.getElementById('lon-min').value,
     lon_max:   document.getElementById('lon-max').value,
-    date_from: document.getElementById('date-from').value,
-    date_to:   document.getElementById('date-to').value,
-    limit:     selLimit
   });
 
   fetch(`/api/data/?${params}`)
     .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json(); })
     .then(renderGeoJSON)
     .catch(err => { hideLoad(); notify('Error: ' + err.message); });
-}
-
-/* ── CSV UPLOAD ───────────────────────────────────────── */
-function uploadCSV() {
-  const file = document.getElementById('csv-file').files[0];
-  if (!file) { notify('Please select a FIRMS CSV file first'); return; }
-  showLoad('Processing swath data');
-  const fd = new FormData();
-  fd.append('file', file);
-  fetch('/classify/', {
-    method: 'POST',
-    headers: { 'X-CSRFToken': csrf() },
-    body: fd
-  })
-    .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json(); })
-    .then(renderGeoJSON)
-    .catch(err => { hideLoad(); notify('Upload error: ' + err.message); });
 }
 
 /* ── AUTO-LOAD ────────────────────────────────────────── */

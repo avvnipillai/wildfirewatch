@@ -503,14 +503,13 @@ p { color: var(--text-muted); margin-bottom: 16px; line-height: 1.75; }
   <div class="header-spacer"></div>
 
   <a href="/" class="nav-pill">Command Map</a>
-  <a href="/about/" class="nav-pill active">Architecture</a>
 </header>
 
 <main class="page">
 
   <div class="hero-tag">Technical Overview</div>
   <h1>From satellite scan to fire classification</h1>
-  <p class="hero-desc">Four machine learning models fused into one system that reads thermal radiation from orbit and decides, in under a second, whether what is burning below is a wildfire or an industrial heat source.</p>
+  <p class="hero-desc">Explore FIRMS thermal anomaly detections from 10 October 2012 to 5 March 2013. The map uses FIRMS records and generated thermal patches; it does not display or classify uploaded satellite swath imagery.</p>
 
   <hr class="divider">
 
@@ -525,7 +524,7 @@ p { color: var(--text-muted); margin-bottom: 16px; line-height: 1.75; }
     </tbody>
   </table>
 
-  <p>When a pixel is significantly hotter than its neighbours, the FIRMS algorithm flags it as a thermal anomaly and records brightness temperature, Fire Radiative Power (FRP) in megawatts, scan geometry, and acquisition time. This project uses 200,000 such records covering South Asia from 2012 to 2023, with 97.8% matched to real satellite swath files.</p>
+  <p>When a pixel is significantly hotter than its neighbours, the FIRMS algorithm flags it as a thermal anomaly and records brightness temperature, Fire Radiative Power (FRP) in megawatts, scan geometry, and acquisition time. This app's 200,000 South Asia records cover 10 October 2012 to 5 March 2013.</p>
 
   <h2>The full pipeline</h2>
 
@@ -558,8 +557,8 @@ p { color: var(--text-muted); margin-bottom: 16px; line-height: 1.75; }
       <div class="pipe-num">04</div>
       <div class="pipe-body">
         <div class="pipe-label">Patches</div>
-        <div class="pipe-title">64 by 64 pixel thermal image extraction</div>
-        <div class="pipe-desc">Each detection becomes a 64x64 crop from the VNP02IMG swath, centred on its pixel, normalised to 0 to 1 range</div>
+        <div class="pipe-title">Generated 64 by 64 thermal patches</div>
+        <div class="pipe-desc">The app generates a simulated patch from each detection's brightness and FRP values; it does not extract a crop from the actual VNP02IMG swath.</div>
       </div>
     </div>
     <div class="pipe-step cool">
@@ -652,9 +651,9 @@ p { color: var(--text-muted); margin-bottom: 16px; line-height: 1.75; }
   <table class="data-table">
     <thead><tr><th>Dataset</th><th>Details</th></tr></thead>
     <tbody>
-      <tr><td>NASA FIRMS VIIRS SV-C2</td><td>200,000 thermal anomaly detections. South Asia 2012 to 2023. Updated within 3 hours of overpass.</td></tr>
+      <tr><td>NASA FIRMS VIIRS SV-C2</td><td>200,000 thermal anomaly detections from South Asia, 10 October 2012 to 5 March 2013.</td></tr>
       <tr><td>WRI Global Power Plant DB</td><td>35,000+ power plants worldwide used as automatic industrial ground truth labels.</td></tr>
-      <tr><td>VNP02IMG + VNP03IMG</td><td>VIIRS radiance and geolocation swath files. 375 m resolution. 97.8% of detections matched to real satellite imagery.</td></tr>
+      <tr><td>Thermal patches</td><td>Simulated 64x64 patterns generated from FIRMS brightness and FRP attributes for map popups.</td></tr>
     </tbody>
   </table>
 

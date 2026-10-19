@@ -1,0 +1,453 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Agni — Wildfire Intelligence</title>
+
+    <style>
+        :root {
+            --bg: #0b1625;
+            --panel: rgba(18, 32, 49, 0.94);
+            --border: #26374a;
+            --text: #e7e5e1;
+            --muted: #8494a7;
+            --orange: #e58b61;
+            --orange-bright: #ff9b6b;
+            --blue: #6ba9c4;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Segoe UI", Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Subtle map-inspired background */
+        .map-background {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            overflow: hidden;
+            background:
+                radial-gradient(
+                    ellipse at 50% 45%,
+                    rgba(28, 56, 77, 0.35),
+                    transparent 65%
+                ),
+                linear-gradient(135deg, #0b1625, #0e1b2b);
+        }
+
+        .map-background::before {
+            content: "";
+            position: absolute;
+            inset: -30%;
+            opacity: 0.2;
+            background-image:
+                repeating-linear-gradient(
+                    25deg,
+                    transparent 0,
+                    transparent 48px,
+                    rgba(104, 151, 180, 0.17) 49px,
+                    transparent 51px
+                ),
+                repeating-linear-gradient(
+                    115deg,
+                    transparent 0,
+                    transparent 70px,
+                    rgba(104, 151, 180, 0.12) 71px,
+                    transparent 73px
+                );
+            transform: rotate(-8deg);
+        }
+
+        .map-background::after {
+            content: "";
+            position: absolute;
+            width: 420px;
+            height: 520px;
+            left: 50%;
+            top: 47%;
+            transform: translate(-50%, -50%) rotate(-12deg);
+            border: 1px dashed rgba(107, 169, 196, 0.2);
+            border-radius: 46% 36% 48% 38%;
+            box-shadow:
+                0 0 0 30px rgba(107, 169, 196, 0.025),
+                0 0 0 70px rgba(107, 169, 196, 0.02);
+            clip-path: polygon(
+                35% 0, 70% 9%, 82% 27%, 100% 39%,
+                76% 51%, 83% 67%, 58% 100%, 40% 78%,
+                18% 66%, 5% 43%, 23% 28%
+            );
+        }
+
+        .heat-point {
+            position: fixed;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--orange);
+            opacity: 0.55;
+            box-shadow: 0 0 15px rgba(229, 139, 97, 0.45);
+            z-index: -1;
+        }
+
+        .point-one { top: 28%; left: 24%; }
+        .point-two { top: 38%; right: 22%; }
+        .point-three { bottom: 25%; left: 32%; }
+        .point-four { bottom: 32%; right: 30%; }
+        .point-five {
+            top: 53%;
+            left: 69%;
+            background: var(--blue);
+        }
+
+        /* Header */
+        header {
+            min-height: 76px;
+            padding: 16px 5%;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(116, 145, 169, 0.14);
+            background: rgba(11, 22, 37, 0.82);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #f0a078, #ad6048);
+            color: white;
+            font-size: 22px;
+            box-shadow: 0 4px 18px rgba(229, 139, 97, 0.16);
+        }
+
+        .brand-name {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 25px;
+            letter-spacing: 0.3px;
+            line-height: 1.05;
+        }
+
+        .brand-subtitle {
+            margin-top: 4px;
+            color: #71879d;
+            font-size: 9px;
+            letter-spacing: 2.1px;
+            text-transform: uppercase;
+        }
+
+        .status {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 14px;
+            border: 1px solid #243448;
+            border-radius: 24px;
+            color: #8da3b7;
+            font-family: monospace;
+            font-size: 11px;
+            letter-spacing: 1.2px;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: #5f9e8d;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(95, 158, 141, 0.35);
+        }
+
+        /* Login content */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 55px 20px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            padding: 38px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
+        }
+
+        .eyebrow {
+            margin-bottom: 14px;
+            color: var(--orange);
+            font-family: monospace;
+            font-size: 10px;
+            letter-spacing: 2.2px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(28px, 5vw, 34px);
+            font-weight: 400;
+            letter-spacing: -0.5px;
+        }
+
+        .description {
+            margin: 0 0 30px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            color: #c7d0d9;
+            font-size: 12px;
+            letter-spacing: 0.4px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #70879c;
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            height: 46px;
+            padding: 0 14px 0 42px;
+            color: #f0f3f5;
+            background: #0c1725;
+            border: 1px solid #2a3b4d;
+            border-radius: 7px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input::placeholder {
+            color: #586b7e;
+        }
+
+        input:focus {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(229, 139, 97, 0.1);
+        }
+
+        .error-message {
+            margin: 0 0 20px;
+            padding: 11px 13px;
+            border: 1px solid rgba(255, 117, 117, 0.25);
+            border-radius: 7px;
+            background: rgba(255, 117, 117, 0.07);
+            color: #ff9d9d;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .login-button {
+            width: 100%;
+            height: 47px;
+            margin-top: 7px;
+            border: 1px solid #e99a72;
+            border-radius: 7px;
+            background: linear-gradient(100deg, #e38b61, #f0a078);
+            color: #152031;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            transition: filter 0.2s, transform 0.2s;
+        }
+
+        .login-button:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .security-note {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
+            margin-top: 23px;
+            color: #6f8295;
+            font-size: 10px;
+            letter-spacing: 0.4px;
+        }
+
+        .security-note span {
+            color: #6aa894;
+        }
+
+        footer {
+            padding: 20px;
+            color: #52677b;
+            text-align: center;
+            font-family: monospace;
+            font-size: 9px;
+            letter-spacing: 2px;
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 14px 20px;
+            }
+
+            .status {
+                padding: 7px 9px;
+                font-size: 9px;
+            }
+
+            .login-card {
+                padding: 28px 23px;
+            }
+
+            main {
+                padding: 35px 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="map-background" aria-hidden="true"></div>
+    <div class="heat-point point-one" aria-hidden="true"></div>
+    <div class="heat-point point-two" aria-hidden="true"></div>
+    <div class="heat-point point-three" aria-hidden="true"></div>
+    <div class="heat-point point-four" aria-hidden="true"></div>
+    <div class="heat-point point-five" aria-hidden="true"></div>
+
+    <header>
+        <div class="brand">
+            <div class="brand-icon" aria-hidden="true">✳</div>
+            <div>
+                <div class="brand-name">Agni</div>
+                <div class="brand-subtitle">Wildfire Intelligence</div>
+            </div>
+        </div>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            VIIRS FEED
+        </div>
+    </header>
+
+    <main>
+        <section class="login-card">
+            <div class="eyebrow">WildfireWatch Access</div>
+
+            <h1>Welcome back</h1>
+
+            <p class="description">
+                Sign in to access the wildfire intelligence
+                platform and command map.
+            </p>
+
+            {% if form.errors %}
+                <div class="error-message" role="alert">
+                    The username or password is incorrect.
+                    Please try again.
+                </div>
+            {% endif %}
+
+            {% if next and user.is_authenticated %}
+                <div class="error-message" role="alert">
+                    Your account does not have permission to access
+                    this page. Please log in with an authorized account.
+                </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_username">Username</label>
+                    <div class="input-wrap">
+                        <span class="input-icon" aria-hidden="true">◎</span>
+                        <input
+                            type="text"
+                            name="username"
+                            id="id_username"
+                            placeholder="Enter your username"
+                            autocomplete="username"
+                            required
+                            autofocus
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_password">Password</label>
+                    <div class="input-wrap">
+                        <span class="input-icon" aria-hidden="true">⌑</span>
+                        <input
+                            type="password"
+                            name="password"
+                            id="id_password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <input type="hidden" name="next" value="{{ next }}">
+
+                <button class="login-button" type="submit">
+                    Log in to Command Map &rarr;
+                </button>
+            </form>
+
+            <div class="security-note">
+                <span>●</span>
+                SECURE AUTHENTICATED ACCESS
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        WILDFIREWATCH &nbsp;•&nbsp; MONITOR. ANALYZE. RESPOND.
+    </footer>
+</body>
+</html>
